@@ -40,22 +40,6 @@ overflow:hidden;
 background:rgba(20,20,20,.55);
 backdrop-filter:blur(30px);
 box-shadow:0 25px 90px rgba(0,0,0,.7);
-position:relative;
-}
-
-/* GLASS SHINE */
-
-.app::before{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(
-120deg,
-rgba(255,255,255,.18),
-transparent 45%
-);
-opacity:.25;
-pointer-events:none;
 }
 
 /* HERO */
@@ -114,11 +98,34 @@ gap:14px;
 }
 
 .beat{
+position:relative;
 padding:14px;
 border-radius:18px;
 background:rgba(255,255,255,.06);
 backdrop-filter:blur(25px);
 transition:.35s;
+overflow:hidden;
+}
+
+/* GLASS SHINE BACK */
+
+.beat::before{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(
+120deg,
+transparent 30%,
+rgba(255,255,255,.25),
+transparent 70%
+);
+opacity:0;
+transition:.35s;
+pointer-events:none;
+}
+
+.beat:hover::before{
+opacity:.25;
 }
 
 .beats:hover .beat{
@@ -186,11 +193,11 @@ background:#fff;
 border-radius:10px;
 }
 
-/* BOTTOM */
+/* BOTTOM ROW FIX */
 
 .bottom{
-display:flex;
-justify-content:space-between;
+display:grid;
+grid-template-columns:1fr auto;
 align-items:center;
 margin-top:10px;
 gap:10px;
@@ -200,14 +207,13 @@ gap:10px;
 font-size:12px;
 opacity:.85;
 white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
 }
+
+/* BUTTONS */
 
 .actions{
 display:flex;
 gap:8px;
-flex-shrink:0;
 }
 
 .download{
@@ -269,10 +275,17 @@ text-decoration:none;
 
 <script>
 
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
+const CSV_URL="<iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pubhtml?widget=true&amp;headers=false"></iframe>";
 
 let currentAudio=null;
 let currentButton=null;
+
+const nameEl=document.getElementById("name");
+const descEl=document.getElementById("desc");
+const heroEl=document.getElementById("hero");
+const bgEl=document.getElementById("bg");
+const socialEl=document.getElementById("social");
+const beatsEl=document.getElementById("beats");
 
 fetch(CSV_URL)
 .then(r=>r.text())
@@ -280,15 +293,15 @@ fetch(CSV_URL)
 
 const rows=text.trim().split("\n").map(r=>r.split(","));
 
-/* PROFILE */
+/* PROFILE FIX */
 
 const profile=rows[1];
 
-name.textContent=profile[0] || "";
-desc.textContent=profile[1] || "";
+nameEl.textContent=profile[0] || "";
+descEl.textContent=profile[1] || "";
 
-hero.style.backgroundImage=`url(${profile[2]})`;
-bg.style.backgroundImage=`url(${profile[2]})`;
+heroEl.style.backgroundImage=`url(${profile[2]})`;
+bgEl.style.backgroundImage=`url(${profile[2]})`;
 
 /* SOCIALS */
 
@@ -303,7 +316,7 @@ const a=document.createElement("a");
 a.href=s[1];
 a.target="_blank";
 a.textContent=s[0];
-social.appendChild(a);
+socialEl.appendChild(a);
 });
 
 const buyLink=profile[7];
@@ -384,7 +397,7 @@ beat.querySelector(".buy").onclick=
 beat.querySelector(".download").onclick=
 ()=>window.open(row[7],"_blank");
 
-beats.appendChild(beat);
+beatsEl.appendChild(beat);
 
 });
 
