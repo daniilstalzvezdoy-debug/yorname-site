@@ -1,15 +1,17 @@
 <script>
 
+document.addEventListener("DOMContentLoaded",()=>{
+
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-/* ===== DOM ===== */
+/* DOM */
 const artistEl=document.getElementById("artist");
 const descriptionEl=document.getElementById("description");
 const heroEl=document.getElementById("hero");
 const socialsEl=document.getElementById("socials");
 const beatsEl=document.getElementById("beats");
 
-/* ===== CSV PARSER ===== */
+/* CSV PARSER */
 function parseCSV(text){
 const rows=[];
 let row=[],value="",inside=false;
@@ -39,23 +41,15 @@ fetch(CSV_URL)
 
 const rows=parseCSV(text);
 
-/* ===== СТРОГАЯ СХЕМА =====
-0 — заголовки профиля
-1 — данные профиля
-2 — пусто
-3 — заголовки битов
-4+ — биты
-*/
-
-const profile = rows[1];
-const beatsData = rows.slice(4);
+const profile=rows[1];
+const beatsData=rows.slice(4);
 
 /* PROFILE */
 
-artistEl.textContent=profile[0]||"";
-descriptionEl.textContent=profile[1]||"";
+artistEl.textContent=profile?.[0]||"";
+descriptionEl.textContent=profile?.[1]||"";
 
-if(profile[2]){
+if(profile?.[2]){
 heroEl.style.backgroundImage=`url(${profile[2]})`;
 document.body.style.backgroundImage=`url(${profile[2]})`;
 }
@@ -63,10 +57,10 @@ document.body.style.backgroundImage=`url(${profile[2]})`;
 /* SOCIALS */
 
 const socialsData=[
-["Telegram",profile[3]],
-["Instagram",profile[4]],
-["YouTube",profile[5]],
-["VK",profile[6]]
+["Telegram",profile?.[3]],
+["Instagram",profile?.[4]],
+["YouTube",profile?.[5]],
+["VK",profile?.[6]]
 ];
 
 socialsEl.innerHTML="";
@@ -80,7 +74,7 @@ a.textContent=s[0];
 socialsEl.appendChild(a);
 });
 
-const buyLink = profile[7] || "#";
+const buyLink=profile?.[7]||"#";
 
 /* BEATS */
 
@@ -145,6 +139,7 @@ audio.currentTime=((e.clientX-r.left)/r.width)*audio.duration;
 });
 
 })
-.catch(e=>console.error("LOAD ERROR:",e));
+.catch(e=>console.error("CSV ERROR:",e));
 
+});
 </script>
