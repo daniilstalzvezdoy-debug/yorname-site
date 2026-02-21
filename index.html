@@ -23,7 +23,7 @@ position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(60px) brightness(.35);
+filter:blur(70px) brightness(.35);
 z-index:-1;
 }
 
@@ -46,18 +46,30 @@ align-items:flex-end;
 padding:20px;
 }
 
+.hero h1{margin:0}
+
+.socials{
+display:flex;
+gap:10px;
+padding:14px;
+}
+
+.socials a{
+background:#ffffff15;
+padding:8px 12px;
+border-radius:12px;
+text-decoration:none;
+color:white;
+font-size:13px;
+}
+
 .beat{
 padding:16px;
 border-top:1px solid rgba(255,255,255,.05);
 }
 
-button{
-background:#ffffff15;
-border:none;
-padding:8px 14px;
-border-radius:12px;
-color:white;
-cursor:pointer;
+.buy{
+float:right;
 }
 </style>
 </head>
@@ -67,6 +79,7 @@ cursor:pointer;
 <div class="bg" id="bg"></div>
 
 <div class="app">
+
 <div class="hero" id="hero">
 <div>
 <h1 id="artistName">Loading...</h1>
@@ -74,61 +87,85 @@ cursor:pointer;
 </div>
 </div>
 
+<div class="socials" id="socials"></div>
+
 <div id="beats"></div>
 
 <div style="text-align:center;padding:14px;opacity:.4;font-size:12px">
 Made by BULAVIN
 </div>
+
 </div>
 
 <script>
 
-const CSV_URL =
+const CSV =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-Papa.parse(CSV_URL, {
-download: true,
-header: false,
-complete: function(results){
+Papa.parse(CSV,{
+download:true,
+complete:(res)=>{
 
-const data = results.data;
+const d=res.data;
 
-const artistName = data[0][0];
-const artistDesc = data[0][1];
-const photo = data[0][2];
-const buyLink = data[0][3];
+/* ===== PROFILE ===== */
 
-document.getElementById("artistName").textContent = artistName;
-document.getElementById("artistDesc").textContent = artistDesc;
+const name=d[1][0];
+const desc=d[1][1];
+const photo=d[1][2];
+const tg=d[1][3];
+const insta=d[1][4];
+const yt=d[1][5];
+const vk=d[1][6];
+const buyLink=d[1][7];
+
+artistName.textContent=name;
+artistDesc.textContent=desc;
 
 if(photo){
 hero.style.backgroundImage=`url(${photo})`;
 bg.style.backgroundImage=`url(${photo})`;
 }
 
+/* socials */
+
+const socials=document.getElementById("socials");
+
+[
+["TG",tg],
+["IG",insta],
+["YT",yt],
+["VK",vk]
+].forEach(([label,link])=>{
+if(link){
+socials.innerHTML+=`<a href="${link}" target="_blank">${label}</a>`;
+}
+});
+
+/* ===== BEATS ===== */
+
 const beats=document.getElementById("beats");
 
-for(let i=4;i<data.length;i++){
+for(let i=4;i<d.length;i++){
 
-const row=data[i];
-if(!row[0]) continue;
+const r=d[i];
+if(!r[0]) continue;
 
-beats.innerHTML += `
+beats.innerHTML+=`
 <div class="beat">
-<b>${row[0]}</b><br>
-<span style="opacity:.6">${row[1]}</span><br><br>
 
-<audio controls src="${row[5]}" style="width:100%"></audio>
+<b>${r[0]}</b><br>
+<span style="opacity:.6">${r[1]}</span><br><br>
 
-<div style="margin-top:8px;font-size:13px;opacity:.7">
-MP3 ${row[2]}₽ | WAV ${row[3]}₽ | EXCL ${row[4]}₽
-</div>
+<audio controls src="${r[5]}" style="width:100%"></audio>
 
 <div style="margin-top:8px">
-<button onclick="window.open('${buyLink}','_blank')">
+MP3 ${r[2]}₽ | WAV ${r[3]}₽ | EXCL ${r[4]}₽
+<button class="buy" onclick="window.open('${buyLink}','_blank')">
 Купить
 </button>
 </div>
+
 </div>`;
 }
 
