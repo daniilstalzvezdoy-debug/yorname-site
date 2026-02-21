@@ -6,7 +6,6 @@
 <title>Beat Page</title>
 
 <style>
-
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 
 body{
@@ -18,8 +17,6 @@ align-items:center;
 color:#fff;
 }
 
-/* BACKGROUND */
-
 .bg{
 position:fixed;
 inset:0;
@@ -30,15 +27,6 @@ transform:scale(1.2);
 z-index:-2;
 }
 
-.bg::after{
-content:"";
-position:absolute;
-inset:0;
-background:radial-gradient(circle,transparent,rgba(0,0,0,.85));
-}
-
-/* APP */
-
 .app{
 width:420px;
 max-width:95%;
@@ -46,46 +34,27 @@ border-radius:28px;
 overflow:hidden;
 backdrop-filter:blur(30px);
 background:rgba(20,20,20,.55);
-box-shadow:
-0 20px 80px rgba(0,0,0,.6),
-inset 0 1px rgba(255,255,255,.15);
+box-shadow:0 20px 80px rgba(0,0,0,.6), inset 0 1px rgba(255,255,255,.15);
 }
-
-/* HERO */
 
 .hero{
 height:240px;
 background-size:cover;
 background-position:center;
-position:relative;
 display:flex;
 align-items:flex-end;
 padding:20px;
+position:relative;
 }
 
 .hero::after{
 content:"";
 position:absolute;
 inset:0;
-background:linear-gradient(to top,rgba(0,0,0,.85),transparent 65%);
+background:linear-gradient(to top,rgba(0,0,0,.85),transparent 60%);
 }
 
-.hero-text{
-position:relative;
-z-index:2;
-}
-
-.hero h1{
-font-size:24px;
-font-weight:700;
-}
-
-.hero p{
-opacity:.85;
-margin-top:6px;
-}
-
-/* SOCIAL */
+.hero-text{position:relative;z-index:2;}
 
 .social{
 display:flex;
@@ -100,14 +69,7 @@ color:#fff;
 padding:8px 14px;
 border-radius:14px;
 background:rgba(255,255,255,.08);
-transition:.25s;
 }
-
-.social a:hover{
-background:rgba(255,255,255,.18);
-}
-
-/* BEATS */
 
 .beats{
 padding:10px 14px 20px;
@@ -120,57 +82,26 @@ gap:14px;
 padding:14px;
 border-radius:18px;
 background:rgba(255,255,255,.06);
-backdrop-filter:blur(25px);
 transition:.35s;
 }
 
-.beats:hover .beat{
-opacity:.35;
-filter:blur(2px);
-}
+.beats:hover .beat{opacity:.35;filter:blur(2px);}
+.beat:hover{opacity:1!important;filter:none!important;transform:scale(1.02);}
 
-.beat:hover{
-opacity:1!important;
-filter:none!important;
-transform:scale(1.02);
-}
-
-/* PLAYER */
-
-.player{
-display:flex;
-align-items:center;
-gap:10px;
-margin-top:10px;
-}
+.player{display:flex;align-items:center;gap:10px;margin-top:10px;}
 
 .play{
-width:36px;
-height:36px;
-border-radius:50%;
-border:none;
-background:rgba(255,255,255,.15);
-color:#fff;
-cursor:pointer;
+width:36px;height:36px;border-radius:50%;
+border:none;background:rgba(255,255,255,.15);
+color:#fff;cursor:pointer;
 }
 
 .progress{
-flex:1;
-height:4px;
-background:#444;
-border-radius:10px;
-cursor:pointer;
-position:relative;
+flex:1;height:4px;background:#444;border-radius:10px;
+cursor:pointer;position:relative;
 }
 
-.bar{
-height:100%;
-width:0%;
-background:#fff;
-border-radius:10px;
-}
-
-/* PRICE */
+.bar{height:100%;width:0%;background:#fff;border-radius:10px;}
 
 .bottom{
 display:flex;
@@ -181,15 +112,7 @@ gap:10px;
 flex-wrap:wrap;
 }
 
-.price{
-font-size:13px;
-opacity:.85;
-}
-
-.actions{
-display:flex;
-gap:8px;
-}
+.actions{display:flex;gap:8px;}
 
 .buy,.download{
 border:none;
@@ -197,22 +120,8 @@ padding:6px 14px;
 border-radius:12px;
 color:#fff;
 cursor:pointer;
-transition:.25s;
+background:rgba(255,255,255,.18);
 }
-
-.buy{
-background:rgba(255,255,255,.2);
-}
-
-.download{
-background:rgba(255,255,255,.08);
-}
-
-.buy:hover,.download:hover{
-background:rgba(255,255,255,.3);
-}
-
-/* FOOTER */
 
 .footer{
 text-align:center;
@@ -224,13 +133,6 @@ opacity:.6;
 .footer a{
 color:#fff;
 text-decoration:none;
-border-bottom:1px solid transparent;
-transition:.25s;
-}
-
-.footer a:hover{
-border-bottom:1px solid rgba(255,255,255,.4);
-opacity:1;
 }
 
 </style>
@@ -250,7 +152,6 @@ opacity:1;
 </div>
 
 <div class="social" id="social"></div>
-
 <div class="beats" id="beats"></div>
 
 <div class="footer">
@@ -265,50 +166,74 @@ opacity:1;
 
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
+/* ===== REAL CSV PARSER ===== */
+
+function parseCSV(text){
+const rows=[];
+let row=[],cell="",quotes=false;
+
+for(let char of text){
+
+if(char=='"'){quotes=!quotes;continue;}
+
+if(char==','&&!quotes){
+row.push(cell);
+cell="";
+continue;
+}
+
+if((char=='\n'||char=='\r')&&!quotes){
+if(cell||row.length){
+row.push(cell);
+rows.push(row);
+row=[];
+cell="";
+}
+continue;
+}
+
+cell+=char;
+}
+
+if(cell)row.push(cell);
+if(row.length)rows.push(row);
+
+return rows;
+}
+
 let currentAudio=null;
 
 fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
-const rows=text.trim().split("\n").map(r=>r.split(","));
-
-/* PROFILE */
+const rows=parseCSV(text);
 
 const p=rows[1];
 
-const name=p[0];
-const desc=p[1];
-const photo=p[2];
-const tg=p[3];
-const ig=p[4];
-const yt=p[5];
-const vk=p[6];
-const buyLink=p[7];
+name.textContent=p[0];
+desc.textContent=p[1];
 
-nameEl.textContent=name;
-descEl.textContent=desc;
+hero.style.backgroundImage=`url(${p[2]})`;
+bg.style.backgroundImage=`url(${p[2]})`;
 
-hero.style.backgroundImage=`url(${photo})`;
-bg.style.backgroundImage=`url(${photo})`;
-
-/* SOCIAL */
+social.innerHTML="";
 
 [
-["Telegram",tg],
-["Instagram",ig],
-["YouTube",yt],
-["VK",vk]
-].forEach(s=>{
-if(!s[1])return;
+["Telegram",p[3]],
+["Instagram",p[4]],
+["YouTube",p[5]],
+["VK",p[6]]
+].forEach(([label,link])=>{
+if(!link)return;
 const a=document.createElement("a");
-a.href=s[1];
+a.href=link;
 a.target="_blank";
-a.textContent=s[0];
+a.textContent=label;
 social.appendChild(a);
 });
 
-/* BEATS */
+beats.innerHTML="";
 
 rows.slice(4).reverse().forEach(r=>{
 
@@ -345,10 +270,9 @@ const bar=beat.querySelector(".bar");
 const progress=beat.querySelector(".progress");
 
 play.onclick=()=>{
-if(currentAudio && currentAudio!==audio){
+if(currentAudio&&currentAudio!==audio){
 currentAudio.pause();
 }
-
 if(audio.paused){
 audio.play();
 play.textContent="❚❚";
@@ -360,6 +284,7 @@ play.textContent="▶";
 };
 
 audio.ontimeupdate=()=>{
+if(audio.duration)
 bar.style.width=(audio.currentTime/audio.duration*100)+"%";
 };
 
@@ -369,16 +294,14 @@ audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;
 };
 
 beat.querySelector(".buy").onclick=()=>{
-window.open(buyLink,"_blank");
+window.open(p[7],"_blank");
 };
 
 beat.querySelector(".download").onclick=()=>{
 const a=document.createElement("a");
 a.href=r[5];
 a.download="";
-document.body.appendChild(a);
 a.click();
-a.remove();
 };
 
 beats.appendChild(beat);
@@ -387,10 +310,7 @@ beats.appendChild(beat);
 
 });
 
-/* YEAR AUTO */
-
-document.getElementById("year").textContent=
-new Date().getFullYear();
+document.getElementById("year").textContent=new Date().getFullYear();
 
 </script>
 
