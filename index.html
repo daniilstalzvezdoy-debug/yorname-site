@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Premium Beat Store</title>
+<title>Beat Store | Витрина</title>
 
 <style>
+/* ОСНОВНЫЕ СТИЛИ */
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#0b0b0b;color:#fff;display:flex;justify-content:center;padding:40px 12px}
+body{background:#0b0b0b;color:#fff;display:flex;justify-content:center;padding:20px 12px;min-height:100vh}
 
 .bg{
 position:fixed;inset:0;
@@ -15,135 +16,145 @@ background-size:cover;
 background-position:center;
 filter:blur(60px) brightness(.4);
 transform:scale(1.2);
-transition:1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+transition:all 1.2s ease;
 z-index:-1;
 }
 
 .bg.playing{
-transform:scale(1.4);
+transform:scale(1.35);
 filter:blur(50px) brightness(.6);
 }
 
 .app{
 width:520px;max-width:100%;
-border-radius:32px;
+border-radius:28px;
+overflow:hidden;
 background:rgba(255,255,255,.03);
-backdrop-filter:blur(40px) saturate(180%);
--webkit-backdrop-filter:blur(40px) saturate(180%);
-border:1px solid rgba(255,255,255,0.08);
-box-shadow:0 30px 100px rgba(0,0,0,0.8);
-position: relative;
+backdrop-filter:blur(30px);
+border:1px solid rgba(255,255,255,.1);
+box-shadow:0 25px 90px rgba(0,0,0,.8);
+display:flex;flex-direction:column;
 }
 
+/* ШАПКА */
 .hero{
-height:260px;
+height:280px;
 background-size:cover;
 background-position:center;
 display:flex;
 align-items:flex-end;
 padding:24px;
 position:relative;
-border-radius:32px 32px 0 0;
-overflow:hidden;
 }
 
-.hero:after{
+.hero::after{
 content:"";
 position:absolute;
 inset:0;
-background:linear-gradient(to top, rgba(11,11,11,1), transparent);
+background:linear-gradient(to top, rgba(11,11,11,1) 0%, rgba(11,11,11,0.5) 50%, transparent 100%);
 }
 
-.hero-text{position:relative;z-index:2}
-.hero h1{font-size:28px; letter-spacing: -0.5px}
-.hero p{opacity:.8; margin-top:4px; font-size: 15px}
+.hero-text{position:relative;z-index:2;width:100%}
+.hero h1{font-size:32px;letter-spacing:-0.5px}
+.hero p{opacity:0.7;margin-top:4px;font-size:15px;line-height:1.4}
 
+/* СОЦСЕТИ */
 .social{
-display:flex; gap:10px; overflow-x:auto; padding:16px 20px;
-scrollbar-width: none;
+display:flex;gap:10px;
+overflow-x:auto;
+padding:16px 24px;
+scrollbar-width:none;
 }
-.social::-webkit-scrollbar { display: none; }
+.social::-webkit-scrollbar{display:none}
 
 .social a{
-white-space:nowrap; padding:10px 18px; border-radius:16px;
-background:rgba(255,255,255,.08);
-border: 1px solid rgba(255,255,255,0.05);
-text-decoration:none; color:#fff; font-size: 13px; font-weight: 500;
-transition: 0.3s;
+padding:8px 18px;
+border-radius:12px;
+background:rgba(255,255,255,.07);
+text-decoration:none;
+color:#fff;
+font-size:13px;
+font-weight:500;
+transition:0.2s;
+border:1px solid rgba(255,255,255,.05);
+white-space:nowrap;
 }
-.social a:hover { background:rgba(255,255,255,.15); transform: translateY(-2px); }
 
-.beats{padding:10px 16px 30px; display:flex; flex-direction:column; gap:16px}
-
-/* ЭФФЕКТ РАЗМЫТИЯ ОСТАЛЬНЫХ БИТОВ ПРИ НАВЕДЕНИИ */
-.beats:hover .beat:not(:hover) {
-    filter: blur(5px);
-    opacity: 0.5;
-    transform: scale(0.97);
-}
+/* СПИСОК БИТОВ */
+.beats{padding:8px 16px 30px;display:flex;flex-direction:column;gap:12px}
 
 .beat{
-padding:20px;
-border-radius:24px;
-background: rgba(255,255,255, 0.05);
-border: 1px solid rgba(255,255,255, 0.05);
-transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+padding:18px;
+border-radius:20px;
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.05);
+transition:0.3s cubic-bezier(0.4,0,0.2,1);
 position:relative;
 }
 
-/* АНИМАЦИЯ "ВЫЛЕТА" */
-.beat:hover {
-    background: rgba(255,255,255, 0.1);
-    transform: scale(1.04) translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255, 0.15);
-    z-index: 10;
-}
+.title{font-weight:700;font-size:17px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:2px}
+.meta{font-size:12px;color:#ff5050;font-weight:400;opacity:0.9}
+.artist{font-size:14px;opacity:0.5;margin-bottom:12px}
 
-.beat::before{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.12),transparent 80%);
-opacity:0;
-transition:.4s;
-pointer-events:none;
-}
-.beat:hover::before{opacity:1}
-
-.title{font-weight:700; font-size: 18px; display:flex; flex-wrap:wrap; gap:8px; align-items: center;}
-.meta{font-size:12px; color:#ff8c8c; font-weight: 400;}
-.artist{font-size:14px; opacity:.6; margin-top:2px}
-
-.player{display:flex; align-items:center; gap:12px; margin-top:16px}
-
+/* ПЛЕЕР */
+.player{display:flex;align-items:center;gap:12px}
 .play{
-width:40px; height:40px; border-radius:50%;
-border:none; background:rgba(255,255,255,0.15); color:#fff;
-cursor:pointer; font-size: 12px;
-display: flex; align-items: center; justify-content: center;
-transition: 0.3s;
-}
-.play:hover { background: #fff; color: #000; }
-
-.progress{flex:1; height:4px; background:rgba(255,255,255,0.1); border-radius:10px; cursor:pointer; position: relative;}
-.bar{height:100%; width:0%; background:#fff; border-radius:10px;}
-
-.bottom{display:flex; justify-content:space-between; align-items: center; margin-top:16px; gap:10px}
-.price{font-size:11px; font-weight: 600; opacity:.8; white-space: nowrap;}
-
-.actions{display:flex; gap:8px}
-
-.download, .buy{
-border:none; padding:8px 16px; border-radius:12px; color:#fff; cursor:pointer; font-size: 12px; font-weight: 600; transition: 0.3s;
+width:40px;height:40px;border-radius:50%;
+border:none;background:#fff;
+color:#000;cursor:pointer;
+display:flex;align-items:center;justify-content:center;
+font-size:14px;transition:0.2s;flex-shrink:0;
 }
 
-.download{background:rgba(255,255,255,.12)}
-.buy{background:rgba(255,80,80,.9)} /* ТА САМАЯ КРАСНАЯ КНОПКА */
-.buy:hover{background:rgba(255,50,50,1); transform: scale(1.05);}
+.progress{flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:10px;cursor:pointer;position:relative}
+.bar{height:100%;width:0%;background:#fff;border-radius:10px}
 
-.footer{text-align:center; padding:20px; font-size:11px; opacity:.5}
-.footer a{color:#fff; text-decoration:none; font-weight: 600;}
+/* КНОПКИ И ЦЕНЫ (ФИКС ВЫЛЕТАНИЯ) */
+.bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    gap: 12px;
+    flex-wrap: wrap; /* Позволяет переносить кнопки вниз */
+}
+
+.price {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+    flex: 1 1 auto;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.download, .buy {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+.download { background: rgba(255,255,255,.1); color: #fff; }
+.buy { background: #ff5050; color: #fff; }
+
+/* Адаптация для совсем узких экранов */
+@media (max-width: 400px) {
+    .bottom { flex-direction: column; align-items: flex-start; }
+    .actions { width: 100%; }
+    .download, .buy { flex: 1; text-align: center; }
+}
+
+.footer{text-align:center;padding:24px;font-size:12px;opacity:0.4}
+.footer a{color:#fff;text-decoration:none}
 </style>
 </head>
 
@@ -154,7 +165,7 @@ border:none; padding:8px 16px; border-radius:12px; color:#fff; cursor:pointer; f
 <div class="app">
     <div class="hero" id="hero">
         <div class="hero-text">
-            <h1 id="name">Loading...</h1>
+            <h1 id="name">Загрузка...</h1>
             <p id="desc"></p>
         </div>
     </div>
@@ -163,22 +174,26 @@ border:none; padding:8px 16px; border-radius:12px; color:#fff; cursor:pointer; f
     <div class="beats" id="beats"></div>
 
     <div class="footer">
-        © <a href="https://t.me/imbulavin" target="_blank">BULAVIN SYSTEM</a>
+        © <span id="year"></span> <a href="https://t.me/imbulavin" target="_blank">BULAVIN SYSTEM</a>
     </div>
 </div>
 
 <script>
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
+document.getElementById('year').textContent = new Date().getFullYear();
 
-let currentAudio=null;
-let currentBtn=null;
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
+let currentAudio = null;
+let currentBtn = null;
+
+// ✅ КОРРЕКТНЫЙ ПАРСЕР CSV
 function parseCSV(text) {
     const result = [];
     let row = [];
     let cell = "";
     let insideQuotes = false;
     text = text.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
     for (let i = 0; i < text.length; i++) {
         let char = text[i];
         if (char === '"' && text[i+1] === '"') { cell += '"'; i++; }
@@ -192,95 +207,97 @@ function parseCSV(text) {
 }
 
 fetch(CSV_URL)
-.then(r=>r.text())
-.then(text=>{
-    const rows = parseCSV(text);
-    const p = rows[1] || [];
+    .then(res => res.text())
+    .then(text => {
+        const rows = parseCSV(text);
+        if (rows.length < 2) return;
 
-    document.getElementById('name').textContent = p[0] || "Artist";
-    document.getElementById('desc').textContent = p[1] || "";
-    
-    if(p[2]) {
-        document.getElementById('hero').style.backgroundImage = `url('${p[2]}')`;
-        document.getElementById('bg').style.backgroundImage = `url('${p[2]}')`;
-    }
-
-    const socialContainer = document.getElementById('social');
-    // ВОЗВРАЩАЕМ ПОЛНЫЕ НАЗВАНИЯ
-    [["Telegram", p[3]], ["Instagram", p[4]], ["YouTube", p[5]], ["VK", p[6]]].forEach(s => {
-        if (s[1] && s[1].includes('http')) {
-            const a = document.createElement("a");
-            a.href = s[1]; a.target = "_blank"; a.textContent = s[0];
-            socialContainer.appendChild(a);
+        const p = rows[1]; 
+        document.getElementById('name').textContent = p[0] || "Artist Name";
+        document.getElementById('desc').textContent = p[1] || "";
+        
+        if(p[2]) {
+            document.getElementById('hero').style.backgroundImage = `url('${p[2]}')`;
+            document.getElementById('bg').style.backgroundImage = `url('${p[2]}')`;
         }
-    });
 
-    const buyLink = p[7] || "#";
-
-    rows.slice(4).forEach(r => {
-        if (!r[0]) return;
-
-        const beat = document.createElement("div");
-        beat.className = "beat";
-        beat.innerHTML = `
-            <div class="title">${r[0]} <span class="meta">| ${r[2] || '0'} BPM | ${r[3] || ''}</span></div>
-            <div class="artist">${r[1] || ""}</div>
-            <div class="player">
-                <button class="play">▶</button>
-                <div class="progress"><div class="bar"></div></div>
-            </div>
-            <div class="bottom">
-                <div class="price">MP3 ${r[4]}₽ | WAV ${r[5]}₽ | EXCL ${r[6]}₽</div>
-                <div class="actions">
-                    <button class="download">MP3</button>
-                    <button class="buy">КУПИТЬ</button>
-                </div>
-            </div>
-        `;
-
-        const audio = new Audio(r[7]);
-        const playBtn = beat.querySelector(".play");
-        const bar = beat.querySelector(".bar");
-        const progress = beat.querySelector(".progress");
-
-        playBtn.onclick = () => {
-            if (currentAudio && currentAudio !== audio) {
-                currentAudio.pause();
-                currentBtn.textContent = "▶";
+        const socialBox = document.getElementById('social');
+        const platforms = [["Telegram", p[3]], ["Instagram", p[4]], ["YouTube", p[5]], ["VK", p[6]]];
+        platforms.forEach(s => {
+            if (s[1] && s[1].length > 5) {
+                const a = document.createElement("a");
+                a.href = s[1]; a.target = "_blank"; a.textContent = s[0];
+                socialBox.appendChild(a);
             }
-            if (audio.paused) {
-                audio.play();
-                playBtn.textContent = "❚❚";
-                currentAudio = audio;
-                currentBtn = playBtn;
-                document.getElementById('bg').classList.add("playing");
-            } else {
-                audio.pause();
+        });
+
+        const buyLink = p[7] || "#";
+        const beatsContainer = document.getElementById('beats');
+
+        rows.slice(4).forEach(r => {
+            if (!r[0]) return;
+
+            const card = document.createElement("div");
+            card.className = "beat";
+            card.innerHTML = `
+                <div class="title">${r[0]} <span class="meta">| ${r[2] || '0'} BPM | ${r[3] || ''}</span></div>
+                <div class="artist">${r[1] || ""}</div>
+                <div class="player">
+                    <button class="play">▶</button>
+                    <div class="progress"><div class="bar"></div></div>
+                </div>
+                <div class="bottom">
+                    <div class="price">MP3 ${r[4]} | WAV ${r[5]} | EXCL ${r[6]}</div>
+                    <div class="actions">
+                        <button class="download">MP3</button>
+                        <button class="buy">КУПИТЬ</button>
+                    </div>
+                </div>
+            `;
+
+            const audio = new Audio(r[7]);
+            const playBtn = card.querySelector(".play");
+            const bar = card.querySelector(".bar");
+            const progress = card.querySelector(".progress");
+
+            playBtn.onclick = () => {
+                if (currentAudio && currentAudio !== audio) {
+                    currentAudio.pause();
+                    currentBtn.textContent = "▶";
+                }
+                if (audio.paused) {
+                    audio.play();
+                    playBtn.textContent = "II";
+                    currentAudio = audio;
+                    currentBtn = playBtn;
+                    document.getElementById('bg').classList.add("playing");
+                } else {
+                    audio.pause();
+                    playBtn.textContent = "▶";
+                    document.getElementById('bg').classList.remove("playing");
+                }
+            };
+
+            audio.ontimeupdate = () => {
+                bar.style.width = (audio.currentTime / audio.duration * 100) + "%";
+            };
+
+            audio.onended = () => {
                 playBtn.textContent = "▶";
                 document.getElementById('bg').classList.remove("playing");
-            }
-        };
+            };
 
-        audio.ontimeupdate = () => {
-            bar.style.width = (audio.currentTime / audio.duration * 100) + "%";
-        };
+            progress.onclick = (e) => {
+                const rect = progress.getBoundingClientRect();
+                audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+            };
 
-        audio.onended = () => {
-            playBtn.textContent = "▶";
-            document.getElementById('bg').classList.remove("playing");
-        };
+            card.querySelector(".buy").onclick = () => window.open(buyLink, "_blank");
+            card.querySelector(".download").onclick = () => window.open(r[7], "_blank");
 
-        progress.onclick = e => {
-            const rect = progress.getBoundingClientRect();
-            audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-        };
-
-        beat.querySelector(".buy").onclick = () => window.open(buyLink, "_blank");
-        beat.querySelector(".download").onclick = () => window.open(r[7], "_blank");
-
-        document.getElementById('beats').appendChild(beat);
+            beatsContainer.appendChild(card);
+        });
     });
-});
 </script>
 
 </body>
