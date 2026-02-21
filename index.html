@@ -89,11 +89,6 @@ border-radius:14px;
 background:rgba(255,255,255,.08);
 text-decoration:none;
 color:#fff;
-transition:.25s;
-}
-
-.social a:hover{
-background:rgba(255,255,255,.18);
 }
 
 /* BEATS */
@@ -116,7 +111,7 @@ overflow:hidden;
 isolation:isolate;
 }
 
-/* glass shine */
+/* GLASS */
 
 .beat::before{
 content:"";
@@ -131,8 +126,6 @@ pointer-events:none;
 
 .beat:hover::before{opacity:1}
 
-/* blur others */
-
 .beats:hover .beat{
 opacity:.35;
 filter:blur(2px);
@@ -146,58 +139,24 @@ transform:translateY(-3px) scale(1.02);
 
 /* TEXT */
 
-.title{
-font-weight:600;
-display:flex;
-flex-wrap:wrap;
-gap:6px;
-}
+.title{font-weight:600;display:flex;flex-wrap:wrap;gap:6px}
 
-.meta{
-font-size:13px;
-opacity:.75;
-color:#ff8c8c;
-}
+.meta{font-size:13px;opacity:.75;color:#ff8c8c}
 
-.artist{
-font-size:14px;
-opacity:.7;
-margin-top:2px;
-}
+.artist{font-size:14px;opacity:.7;margin-top:2px}
 
 /* PLAYER */
 
-.player{
-display:flex;
-align-items:center;
-gap:10px;
-margin-top:10px;
-}
+.player{display:flex;align-items:center;gap:10px;margin-top:10px}
 
 .play{
-width:36px;
-height:36px;
-border-radius:50%;
-border:none;
-background:rgba(255,255,255,.15);
-color:#fff;
-cursor:pointer;
+width:36px;height:36px;border-radius:50%;
+border:none;background:rgba(255,255,255,.15);
+color:#fff;cursor:pointer;
 }
 
-.progress{
-flex:1;
-height:4px;
-background:#444;
-border-radius:10px;
-cursor:pointer;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:#fff;
-border-radius:10px;
-}
+.progress{flex:1;height:4px;background:#444;border-radius:10px;cursor:pointer}
+.bar{height:100%;width:0%;background:#fff;border-radius:10px}
 
 /* BOTTOM */
 
@@ -210,49 +169,22 @@ gap:10px;
 flex-wrap:wrap;
 }
 
-.price{
-font-size:12px;
-opacity:.85;
-white-space:nowrap;
-}
+.price{font-size:12px;opacity:.85;white-space:nowrap}
 
-.actions{
-display:flex;
-gap:8px;
-margin-left:auto;
-}
+.actions{display:flex;gap:8px;margin-left:auto}
 
 .download{
-border:none;
-padding:6px 12px;
-border-radius:12px;
-background:rgba(255,255,255,.12);
-color:#fff;
-cursor:pointer;
+border:none;padding:6px 12px;border-radius:12px;
+background:rgba(255,255,255,.12);color:#fff;cursor:pointer;
 }
 
 .buy{
-border:none;
-padding:6px 14px;
-border-radius:12px;
-background:rgba(255,80,80,.9);
-color:#fff;
-cursor:pointer;
+border:none;padding:6px 14px;border-radius:12px;
+background:rgba(255,80,80,.9);color:#fff;cursor:pointer;
 }
 
-/* FOOTER */
-
-.footer{
-text-align:center;
-padding:16px;
-font-size:12px;
-opacity:.6;
-}
-
-.footer a{
-color:#fff;
-text-decoration:none;
-}
+.footer{text-align:center;padding:16px;font-size:12px;opacity:.6}
+.footer a{color:#fff;text-decoration:none}
 
 </style>
 </head>
@@ -290,20 +222,21 @@ fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
-text=text.replace(/^\uFEFF/,'');
+/* ✅ FINAL GOOGLE CSV FIX */
+text = text.replace(/^\uFEFF/, "").replace(/\r/g,"");
 
 const rows=text.trim().split("\n").map(r=>r.split(","));
 
-const p=rows[1];
+const p=rows[1]||[];
 
-name.textContent=p[0] || "YourName";
-desc.textContent=p[1] || "";
+document.getElementById("name").textContent=p[0]||"YourName";
+document.getElementById("desc").textContent=p[1]||"";
 
 hero.style.backgroundImage=`url(${p[2]})`;
 bg.style.backgroundImage=`url(${p[2]})`;
 defaultBg=p[2];
 
-/* socials */
+/* SOCIALS */
 
 [
 ["Telegram",p[3]],
@@ -321,7 +254,7 @@ social.appendChild(a);
 
 const buyLink=p[7];
 
-/* beats */
+/* BEATS */
 
 rows.slice(4).forEach(r=>{
 
@@ -375,7 +308,6 @@ playBtn.textContent="❚❚";
 currentAudio=audio;
 audio.btn=playBtn;
 bg.classList.add("playing");
-bg.style.backgroundImage=`url(${p[2]})`;
 }else{
 audio.pause();
 playBtn.textContent="▶";
