@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Beat Page</title>
 
+<!-- CSV PARSER (главный фикс всей боли) -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 <style>
 body{
 margin:0;
@@ -14,16 +17,14 @@ display:flex;
 justify-content:center;
 padding:40px 10px;
 color:#fff;
-overflow-x:hidden;
 }
 
-/* BLUR BACKGROUND */
 .bg{
 position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(80px) brightness(.4);
+filter:blur(90px) brightness(.4);
 z-index:-1;
 }
 
@@ -34,10 +35,11 @@ background:rgba(20,20,20,.65);
 backdrop-filter:blur(30px);
 border-radius:28px;
 overflow:hidden;
-box-shadow:0 40px 120px rgba(0,0,0,.6);
+box-shadow:0 40px 120px rgba(0,0,0,.7);
 }
 
 /* HERO */
+
 .hero{
 height:260px;
 background-size:cover;
@@ -61,12 +63,13 @@ z-index:2;
 }
 
 .desc{
-opacity:.8;
+opacity:.85;
 font-size:14px;
 margin-top:6px;
 }
 
 /* SOCIAL */
+
 .social{
 display:flex;
 gap:8px;
@@ -84,9 +87,8 @@ font-size:13px;
 }
 
 /* BEATS */
-.beats{
-padding:10px 14px 20px;
-}
+
+.beats{padding:14px;}
 
 .beat{
 background:rgba(255,255,255,.06);
@@ -95,10 +97,7 @@ padding:14px;
 margin-bottom:12px;
 }
 
-audio{
-width:100%;
-margin:8px 0;
-}
+audio{width:100%;margin:10px 0;}
 
 .row{
 display:flex;
@@ -127,18 +126,17 @@ padding:14px;
 
 <body>
 
-<div class="bg" id="bg"></div>
+<div id="bg" class="bg"></div>
 
 <div class="app">
 
-<div class="hero" id="hero">
+<div id="hero" class="hero">
 <h1 id="name">Loading...</h1>
-<div class="desc" id="desc"></div>
+<div id="desc" class="desc"></div>
 </div>
 
-<div class="social" id="social"></div>
-
-<div class="beats" id="beats"></div>
+<div id="social" class="social"></div>
+<div id="beats" class="beats"></div>
 
 <div class="footer">Made by BULAVIN</div>
 
@@ -146,26 +144,28 @@ padding:14px;
 
 <script>
 
-const CSV_LINK =
+const CSV =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-fetch(CSV_LINK)
-.then(r=>r.text())
-.then(text=>{
+/* ===== LOAD CSV SAFE ===== */
 
-const rows=text.trim().split("\n").map(r=>r.split(","));
+Papa.parse(CSV,{
+download:true,
+complete:(res)=>{
 
-/* ===== PROFILE ===== */
-const profile=rows[1];
+const rows=res.data;
 
-const name=profile[0];
-const desc=profile[1];
-const photo=profile[2];
-const tg=profile[3];
-const ig=profile[4];
-const yt=profile[5];
-const vk=profile[6];
-const buyLink=profile[7];
+/* PROFILE */
+const p=rows[1];
+
+const name=p[0];
+const desc=p[1];
+const photo=p[2];
+const tg=p[3];
+const ig=p[4];
+const yt=p[5];
+const vk=p[6];
+const buy=p[7];
 
 document.getElementById("name").textContent=name;
 document.getElementById("desc").textContent=desc;
@@ -173,7 +173,7 @@ document.getElementById("desc").textContent=desc;
 document.getElementById("hero").style.backgroundImage=`url(${photo})`;
 document.getElementById("bg").style.backgroundImage=`url(${photo})`;
 
-/* SOCIAL BUTTONS */
+/* SOCIAL */
 
 const social=document.getElementById("social");
 
@@ -182,54 +182,47 @@ const social=document.getElementById("social");
 ["Instagram",ig],
 ["YouTube",yt],
 ["VK",vk]
-].forEach(([title,link])=>{
-if(link){
+].forEach(([t,l])=>{
+if(!l) return;
 const a=document.createElement("a");
-a.href=link;
+a.href=l;
 a.target="_blank";
-a.textContent=title;
+a.textContent=t;
 social.appendChild(a);
-}
 });
 
-/* ===== BEATS ===== */
+/* BEATS */
 
-const beatsDiv=document.getElementById("beats");
+const beats=document.getElementById("beats");
 
 rows.slice(4).forEach(r=>{
 
 if(!r[0]) return;
 
-const title=r[0];
-const type=r[1];
-const mp3=r[2];
-const wav=r[3];
-const excl=r[4];
-const url=r[5];
+const div=document.createElement("div");
+div.className="beat";
 
-const el=document.createElement("div");
-el.className="beat";
+div.innerHTML=`
+<b>${r[0]}</b><br>
+<small>${r[1]}</small>
 
-el.innerHTML=`
-<b>${title}</b><br>
-<small>${type}</small>
-
-<audio controls src="${url}"></audio>
+<audio controls src="${r[5]}"></audio>
 
 <div class="row">
-<div>MP3 ${mp3} | WAV ${wav} | EXCL ${excl}</div>
+<div>MP3 ${r[2]} | WAV ${r[3]} | EXCL ${r[4]}</div>
 <button class="buy">Купить</button>
 </div>
 `;
 
-el.querySelector(".buy").onclick=()=>window.open(buyLink,"_blank");
+div.querySelector(".buy").onclick=()=>window.open(buy,"_blank");
 
-beatsDiv.appendChild(el);
-
-});
+beats.appendChild(div);
 
 });
+
+}
+});
+
 </script>
-
 </body>
 </html>
