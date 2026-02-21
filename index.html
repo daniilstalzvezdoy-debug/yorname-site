@@ -3,92 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beat Store</title>
+
+<title>Beat Page</title>
 
 <style>
+
+/* =========================
+   RESET
+========================= */
 
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-color:white;
+font-family:-apple-system,BlinkMacSystemFont,Inter,system-ui,sans-serif;
 }
 
 body{
-background:#0b0b0b;
+background:#0b0b0c;
+color:white;
 min-height:100vh;
-overflow-x:hidden;
+display:flex;
+justify-content:center;
 }
 
-/* BACKGROUND */
-.bg{
-position:fixed;
-inset:0;
-background-size:cover;
-background-position:center;
-filter:blur(45px) brightness(.35);
-z-index:-1;
-}
+/* =========================
+   LAYOUT
+========================= */
 
-/* MAIN CARD */
 .container{
-max-width:900px;
-margin:40px auto;
-padding:24px;
-background:rgba(255,255,255,.08);
-backdrop-filter:blur(25px);
-border-radius:24px;
-box-shadow:0 20px 60px rgba(0,0,0,.6);
+width:100%;
+max-width:720px;
+padding:20px 16px 40px;
 }
 
-/* HERO */
+/* =========================
+   GLASS SYSTEM
+========================= */
+
+.glass{
+background:rgba(255,255,255,0.06);
+backdrop-filter:blur(22px);
+-webkit-backdrop-filter:blur(22px);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:22px;
+box-shadow:
+0 10px 30px rgba(0,0,0,.5),
+inset 0 1px rgba(255,255,255,.06);
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+position:relative;
+overflow:hidden;
+margin-bottom:18px;
+}
+
 .hero img{
 width:100%;
-border-radius:18px;
-margin-bottom:15px;
+height:320px;
+object-fit:cover;
+display:block;
 }
 
-.nickname{
-font-size:34px;
+.hero-overlay{
+position:absolute;
+bottom:0;
+left:0;
+right:0;
+padding:28px 20px;
+background:linear-gradient(
+to top,
+rgba(0,0,0,.85),
+rgba(0,0,0,.35),
+transparent
+);
+}
+
+.hero h1{
+font-size:32px;
 font-weight:700;
-margin-bottom:8px;
+margin-bottom:6px;
 }
 
-.description{
-opacity:.8;
-margin-bottom:20px;
+.hero p{
+opacity:.85;
+font-size:15px;
 }
 
-/* SOCIALS */
+/* =========================
+   SOCIAL BUTTONS
+========================= */
+
 .socials{
 display:flex;
-gap:10px;
 flex-wrap:wrap;
-margin-bottom:30px;
+gap:10px;
+margin-bottom:18px;
 }
 
 .socials a{
 text-decoration:none;
-padding:10px 16px;
-border-radius:10px;
-background:rgba(255,255,255,.12);
-transition:.2s;
+color:white;
+padding:10px 18px;
+border-radius:14px;
+font-size:14px;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(16px);
+border:1px solid rgba(255,255,255,.08);
+transition:.25s;
 }
 
 .socials a:hover{
-background:rgba(255,255,255,.25);
+background:rgba(255,255,255,.18);
 }
 
-/* BEATS */
-.beat-card{
-background:rgba(255,255,255,.06);
+/* =========================
+   BEAT CARD
+========================= */
+
+.beat{
 padding:18px;
-border-radius:16px;
 margin-bottom:14px;
-display:flex;
-flex-direction:column;
-gap:10px;
+transition:.35s;
+position:relative;
+}
+
+.beat:hover{
+transform:scale(1.02);
+box-shadow:0 20px 40px rgba(0,0,0,.7);
 }
 
 .beat-title{
@@ -96,45 +142,100 @@ font-size:18px;
 font-weight:600;
 }
 
-.type{
+.beat-type{
 opacity:.6;
+margin-bottom:12px;
 font-size:14px;
 }
 
-audio{
-width:100%;
+/* =========================
+   PLAYER
+========================= */
+
+.player{
+display:flex;
+align-items:center;
+gap:12px;
+margin:10px 0;
 }
 
-.prices{
+.play{
+width:38px;
+height:38px;
+border-radius:50%;
+border:none;
+cursor:pointer;
+background:white;
+color:black;
+font-weight:bold;
+}
+
+.progress{
+flex:1;
+height:4px;
+background:rgba(255,255,255,.2);
+border-radius:5px;
+position:relative;
+cursor:pointer;
+}
+
+.progress-bar{
+height:100%;
+width:0%;
+background:white;
+border-radius:5px;
+}
+
+.time{
+font-size:12px;
+opacity:.7;
+width:42px;
+text-align:right;
+}
+
+/* =========================
+   PRICE + BUY
+========================= */
+
+.bottom{
 display:flex;
 justify-content:space-between;
 align-items:center;
+margin-top:8px;
 flex-wrap:wrap;
 gap:10px;
 }
 
-.price-list span{
-margin-right:14px;
+.price{
+opacity:.85;
+font-size:14px;
 }
 
 .buy{
+padding:10px 18px;
+border-radius:14px;
+border:none;
 background:white;
 color:black;
-padding:10px 18px;
-border-radius:10px;
-text-decoration:none;
 font-weight:600;
-transition:.2s;
+cursor:pointer;
 }
 
-.buy:hover{
-transform:scale(1.05);
+/* =========================
+   HOVER BLUR EFFECT
+========================= */
+
+.list:hover .beat:not(:hover){
+filter:blur(3px);
+opacity:.5;
 }
 
-@media(max-width:700px){
-.container{
-margin:12px;
-}
+/* ========================= */
+
+.loading{
+text-align:center;
+opacity:.6;
+padding:40px;
 }
 
 </style>
@@ -142,153 +243,156 @@ margin:12px;
 
 <body>
 
-<div class="bg" id="bg"></div>
-
 <div class="container">
 
-<div class="hero">
-<img id="profilePhoto">
-<div class="nickname" id="nickname"></div>
-<div class="description" id="description"></div>
-<div class="socials" id="socials"></div>
-</div>
-
-<div id="beats"></div>
+<div id="app" class="loading">Loading...</div>
 
 </div>
 
 <script>
 
-/* ===== GOOGLE SHEETS CSV ===== */
+/* =========================
+   👉 ВСТАВЬ СВОЙ CSV
+========================= */
+
 const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-/* ===== SAFE CSV PARSER ===== */
-function parseCSV(text){
-const rows=[];
-let row=[];
-let cell="";
-let insideQuotes=false;
-
-for(let i=0;i<text.length;i++){
-const char=text[i];
-
-if(char === '"'){
-insideQuotes=!insideQuotes;
-continue;
-}
-
-if(char === ',' && !insideQuotes){
-row.push(cell.trim());
-cell="";
-continue;
-}
-
-if((char === '\n' || char === '\r') && !insideQuotes){
-if(cell || row.length){
-row.push(cell.trim());
-rows.push(row);
-row=[];
-cell="";
-}
-continue;
-}
-
-cell+=char;
-}
-
-if(cell) row.push(cell.trim());
-if(row.length) rows.push(row);
-
-return rows;
-}
+/* ========================= */
 
 let currentAudio=null;
+
+function parseCSV(text){
+return text.trim().split("\n").map(r=>r.split(","));
+}
+
+function formatTime(sec){
+if(!sec)return"0:00";
+let m=Math.floor(sec/60);
+let s=Math.floor(sec%60).toString().padStart(2,"0");
+return `${m}:${s}`;
+}
 
 fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
-const data=parseCSV(text);
+const rows=parseCSV(text);
 
-/* ==== PROFILE ROW ==== */
-const profile=data.find(r=>r[0] && r[0]!=="Псевдоним");
+const name=rows[1][0];
+const desc=rows[1][1];
+const photo=rows[1][2];
 
-const nickname=profile[0];
-const description=profile[1];
-const photo=profile[2];
-const telegram=profile[3];
-const instagram=profile[4];
-const youtube=profile[5];
-const vk=profile[6];
-const buyLink=profile[7];
+const telegram=rows[1][3];
+const instagram=rows[1][4];
+const youtube=rows[1][5];
+const vk=rows[1][6];
+const buyLink=rows[1][7];
 
-document.getElementById("nickname").textContent=nickname||"";
-document.getElementById("description").textContent=description||"";
-document.getElementById("profilePhoto").src=photo||"";
-document.getElementById("bg").style.backgroundImage=`url(${photo})`;
+let html=`
 
-/* ==== SOCIALS ==== */
-const socials=document.getElementById("socials");
-
-[
-["Telegram",telegram],
-["Instagram",instagram],
-["YouTube",youtube],
-["VK",vk]
-].forEach(([name,link])=>{
-if(!link) return;
-const a=document.createElement("a");
-a.href=link;
-a.target="_blank";
-a.rel="noopener";
-a.textContent=name;
-socials.appendChild(a);
-});
-
-/* ==== FIND BEATS ==== */
-const startIndex=data.findIndex(r=>r[0]==="Название");
-
-const beatsContainer=document.getElementById("beats");
-
-for(let i=startIndex+1;i<data.length;i++){
-
-const row=data[i];
-if(!row || !row[0]) continue;
-
-const [title,type,mp3,wav,excl,preview]=row;
-
-const card=document.createElement("div");
-card.className="beat-card";
-
-card.innerHTML=`
-<div class="beat-title">${title}</div>
-<div class="type">${type||""}</div>
-
-<audio controls preload="none" src="${preview||""}"></audio>
-
-<div class="prices">
-<div class="price-list">
-<span>MP3: $${mp3||"-"}</span>
-<span>WAV: $${wav||"-"}</span>
-<span>EXCL: $${excl||"-"}</span>
+<div class="hero glass">
+<img src="${photo}">
+<div class="hero-overlay">
+<h1>${name}</h1>
+<p>${desc}</p>
+</div>
 </div>
 
-<a class="buy" href="${buyLink||"#"}" target="_blank">Купить</a>
+<div class="socials">
+<a href="${telegram}" target="_blank">Telegram</a>
+<a href="${instagram}" target="_blank">Instagram</a>
+<a href="${youtube}" target="_blank">YouTube</a>
+<a href="${vk}" target="_blank">VK</a>
 </div>
+
+<div class="list">
 `;
 
-const audio=card.querySelector("audio");
+for(let i=4;i<rows.length;i++){
 
-audio.addEventListener("play",()=>{
+let r=rows[i];
+if(!r[0]) continue;
+
+html+=`
+<div class="beat glass">
+
+<div class="beat-title">${r[0]}</div>
+<div class="beat-type">${r[1]}</div>
+
+<div class="player">
+<button class="play">▶</button>
+
+<div class="progress">
+<div class="progress-bar"></div>
+</div>
+
+<div class="time">0:00</div>
+</div>
+
+<div class="bottom">
+<div class="price">
+MP3 ${r[2]}₽ | WAV ${r[3]}₽ | EXCL ${r[4]}₽
+</div>
+
+<button class="buy" onclick="window.open('${buyLink}','_blank')">
+Купить
+</button>
+</div>
+
+<audio src="${r[5]}"></audio>
+
+</div>
+`;
+}
+
+html+=`</div>`;
+
+document.getElementById("app").innerHTML=html;
+
+/* PLAYER LOGIC */
+
+document.querySelectorAll(".beat").forEach(card=>{
+
+const audio=card.querySelector("audio");
+const playBtn=card.querySelector(".play");
+const bar=card.querySelector(".progress-bar");
+const progress=card.querySelector(".progress");
+const time=card.querySelector(".time");
+
+playBtn.onclick=()=>{
+
 if(currentAudio && currentAudio!==audio){
 currentAudio.pause();
+currentAudio.parentElement.querySelector(".play").textContent="▶";
 }
-currentAudio=audio;
-});
 
-beatsContainer.appendChild(card);
+if(audio.paused){
+audio.play();
+playBtn.textContent="❚❚";
+currentAudio=audio;
+}else{
+audio.pause();
+playBtn.textContent="▶";
 }
+};
+
+audio.ontimeupdate=()=>{
+bar.style.width=(audio.currentTime/audio.duration*100)+"%";
+time.textContent=formatTime(audio.currentTime);
+};
+
+progress.onclick=e=>{
+const rect=progress.getBoundingClientRect();
+const pct=(e.clientX-rect.left)/rect.width;
+audio.currentTime=pct*audio.duration;
+};
+
+audio.onended=()=>{
+playBtn.textContent="▶";
+};
+
+});
 
 });
 
