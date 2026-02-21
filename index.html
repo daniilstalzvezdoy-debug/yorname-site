@@ -28,6 +28,7 @@ background-position:center;
 filter:blur(70px) brightness(.6);
 transform:scale(1.2);
 z-index:-2;
+transition:filter .6s ease;
 }
 
 /* APP */
@@ -98,11 +99,34 @@ padding:14px;
 border-radius:18px;
 background:rgba(255,255,255,.06);
 transition:.35s;
+position:relative;
+overflow:hidden;
+}
+
+/* GLASS LIGHT SWEEP */
+
+.beat::before{
+content:"";
+position:absolute;
+inset:-40%;
+background:linear-gradient(
+120deg,
+transparent 40%,
+rgba(255,255,255,.15),
+transparent 60%
+);
+opacity:0;
+transition:.6s;
+transform:translateX(-60%);
+pointer-events:none;
+}
+
+.beat:hover::before{
+opacity:1;
+transform:translateX(60%);
 }
 
 /* SMART HOVER */
-
-.beats .beat{transition:.35s;}
 
 .beats .beat:hover{
 transform:scale(1.02);
@@ -113,6 +137,15 @@ z-index:2;
 .beats .beat:has(~ .beat:hover){
 opacity:.35;
 filter:blur(2px);
+}
+
+/* ACTIVE BEAT */
+
+.beat.active{
+box-shadow:
+0 0 25px rgba(255,255,255,.08),
+0 0 60px rgba(255,255,255,.05);
+transform:scale(1.01);
 }
 
 /* PLAYER */
@@ -150,7 +183,7 @@ background:#fff;
 border-radius:10px;
 }
 
-/* PRICE + BUTTONS */
+/* PRICE */
 
 .bottom{
 display:flex;
@@ -241,7 +274,6 @@ const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlU
 function parseCSV(text){
 const rows=[];
 let row=[],cell="",quotes=false;
-
 for(let char of text){
 if(char=='"'){quotes=!quotes;continue;}
 if(char==','&&!quotes){row.push(cell);cell="";continue;}
@@ -265,8 +297,8 @@ fetch(CSV_URL)
 const rows=parseCSV(text);
 const p=rows[1];
 
-document.getElementById("name").textContent=p[0];
-document.getElementById("desc").textContent=p[1];
+name.textContent=p[0];
+desc.textContent=p[1];
 
 hero.style.backgroundImage=`url(${p[2]})`;
 bg.style.backgroundImage=`url(${p[2]})`;
@@ -324,9 +356,24 @@ const bar=beat.querySelector(".bar");
 const progress=beat.querySelector(".progress");
 
 play.onclick=()=>{
-if(currentAudio&&currentAudio!==audio){currentAudio.pause();}
-if(audio.paused){audio.play();play.textContent="❚❚";currentAudio=audio;}
-else{audio.pause();play.textContent="▶";}
+
+if(currentAudio && currentAudio!==audio){
+currentAudio.pause();
+currentAudio.parentElement.classList.remove("active");
+}
+
+if(audio.paused){
+audio.play();
+play.textContent="❚❚";
+beat.classList.add("active");
+bg.style.filter="blur(80px) brightness(.75)";
+currentAudio=audio;
+}else{
+audio.pause();
+play.textContent="▶";
+beat.classList.remove("active");
+bg.style.filter="blur(70px) brightness(.6)";
+}
 };
 
 audio.ontimeupdate=()=>{
@@ -356,7 +403,7 @@ beats.appendChild(beat);
 
 });
 
-document.getElementById("year").textContent=new Date().getFullYear();
+year.textContent=new Date().getFullYear();
 
 </script>
 
