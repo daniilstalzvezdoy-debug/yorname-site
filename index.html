@@ -1,94 +1,174 @@
-<script>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Beat Page</title>
 
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
-
-/* load csv */
-fetch(CSV_URL)
-.then(r=>r.text())
-.then(text=>{
-
-const lines=text.trim().split("\n").map(l=>l.split(","));
-
-/* ========= META ========= */
-
-const meta={};
-
-for(let i=0;i<4;i++){
-meta[lines[i][0]]=lines[i][1];
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#111;
+display:flex;
+justify-content:center;
+padding:40px 10px;
 }
 
-document.getElementById("artist").textContent=meta.artist;
-document.getElementById("desc").textContent=meta.description;
+.bg{
+position:fixed;
+inset:0;
+background-size:cover;
+background-position:center;
+filter:blur(60px) brightness(.4);
+z-index:-1;
+}
 
-/* photo everywhere */
-document.querySelector(".hero").style.backgroundImage=`url(${meta.photo})`;
-document.body.style.setProperty(
-'--bg',
-`url(${meta.photo})`
-);
+.app{
+width:420px;
+max-width:100%;
+background:#0b0b0bcc;
+backdrop-filter:blur(25px);
+border-radius:28px;
+overflow:hidden;
+color:white;
+box-shadow:0 30px 80px rgba(0,0,0,.6);
+}
 
-/* ========= BEATS ========= */
+.hero{
+height:260px;
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:flex-end;
+padding:20px;
+}
 
-const headerIndex=lines.findIndex(r=>r[0]==="title");
-const beats=lines.slice(headerIndex+1);
+.hero h1{
+margin:0;
+font-size:24px;
+}
 
-const container=document.getElementById("beats");
+.desc{
+opacity:.7;
+font-size:14px;
+}
 
-beats.forEach(row=>{
+.beat{
+padding:16px;
+border-top:1px solid rgba(255,255,255,.05);
+}
 
-const [title,type,mp3,wav,exc,file]=row;
-if(!file) return;
+button{
+background:#ffffff15;
+border:none;
+padding:8px 14px;
+border-radius:12px;
+color:white;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="bg"></div>
+
+<div class="app">
+
+<div class="hero" id="hero">
+<div>
+<h1 id="artistName">Loading...</h1>
+<div class="desc" id="artistDesc"></div>
+</div>
+</div>
+
+<div id="beats"></div>
+
+<div style="text-align:center;padding:14px;opacity:.4;font-size:12px">
+Made by BULAVIN
+</div>
+
+</div>
+
+<script>
+
+const CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
+
+async function load(){
+
+const res = await fetch(CSV_URL+"?t="+Date.now());
+const text = await res.text();
+
+const rows = text.trim().split("\n").map(r=>r.split(","));
+
+/*
+СТРУКТУРА:
+
+A1 имя
+B1 описание
+C1 фото
+D1 buy link
+
+A4 заголовки
+A5+ биты
+*/
+
+const artistName = rows[0][0] || "Artist";
+const artistDesc = rows[0][1] || "";
+const photo = rows[0][2] || "";
+const buyLink = rows[0][3] || "#";
+
+document.getElementById("artistName").textContent = artistName;
+document.getElementById("artistDesc").textContent = artistDesc;
+
+if(photo){
+document.getElementById("hero").style.backgroundImage=`url(${photo})`;
+document.getElementById("bg").style.backgroundImage=`url(${photo})`;
+}
+
+const beatsContainer=document.getElementById("beats");
+
+for(let i=4;i<rows.length;i++){
+
+const row=rows[i];
+if(!row[0]) continue;
+
+const title=row[0];
+const type=row[1];
+const mp3=row[2];
+const wav=row[3];
+const excl=row[4];
+const file=row[5];
 
 const beat=document.createElement("div");
 beat.className="beat";
 
 beat.innerHTML=`
 <b>${title}</b><br>
-<small>${type}</small>
+<span style="opacity:.6">${type}</span><br><br>
 
-<button class="play">▶</button>
-<div class="progress"><div class="bar"></div></div>
+<audio controls src="${file}" style="width:100%"></audio>
 
-<div class="price">
-MP3 ${mp3}₽ | WAV ${wav}₽ | EXCL ${exc}₽
-<button class="buy">Купить</button>
+<div style="margin-top:8px;font-size:13px;opacity:.7">
+MP3 ${mp3}₽ | WAV ${wav}₽ | EXCL ${excl}₽
+</div>
+
+<div style="margin-top:8px">
+<button onclick="window.open('${buyLink}','_blank')">
+Купить
+</button>
 </div>
 `;
 
-container.appendChild(beat);
-
-const audio=new Audio(file);
-
-const play=beat.querySelector(".play");
-const bar=beat.querySelector(".bar");
-const prog=beat.querySelector(".progress");
-const buy=beat.querySelector(".buy");
-
-play.onclick=()=>{
-if(audio.paused){
-audio.play();
-play.textContent="❚❚";
-}else{
-audio.pause();
-play.textContent="▶";
+beatsContainer.appendChild(beat);
 }
-};
 
-audio.ontimeupdate=()=>{
-bar.style.width=(audio.currentTime/audio.duration*100)+"%";
-};
+}
 
-prog.onclick=e=>{
-const rect=prog.getBoundingClientRect();
-audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;
-};
-
-buy.onclick=()=>{
-window.open(meta.buy_link,"_blank");
-};
-
-});
-
-});
+load();
 
 </script>
+</body>
+</html>
