@@ -15,7 +15,6 @@ min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-overflow-x:hidden;
 color:#fff;
 }
 
@@ -26,7 +25,7 @@ position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(60px) brightness(.6);
+filter:blur(70px) brightness(.6);
 transform:scale(1.2);
 z-index:-2;
 }
@@ -35,7 +34,7 @@ z-index:-2;
 content:"";
 position:absolute;
 inset:0;
-background:radial-gradient(circle at center,transparent,rgba(0,0,0,.8));
+background:radial-gradient(circle,transparent,rgba(0,0,0,.85));
 }
 
 /* APP */
@@ -68,7 +67,7 @@ padding:20px;
 content:"";
 position:absolute;
 inset:0;
-background:linear-gradient(to top,rgba(0,0,0,.85),transparent 60%);
+background:linear-gradient(to top,rgba(0,0,0,.85),transparent 65%);
 }
 
 .hero-text{
@@ -76,8 +75,15 @@ position:relative;
 z-index:2;
 }
 
-.hero h1{font-size:22px;font-weight:700}
-.hero p{opacity:.8;margin-top:4px}
+.hero h1{
+font-size:24px;
+font-weight:700;
+}
+
+.hero p{
+opacity:.85;
+margin-top:6px;
+}
 
 /* SOCIAL */
 
@@ -114,6 +120,7 @@ gap:14px;
 padding:14px;
 border-radius:18px;
 background:rgba(255,255,255,.06);
+backdrop-filter:blur(25px);
 transition:.35s;
 }
 
@@ -170,24 +177,60 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 margin-top:10px;
+gap:10px;
+flex-wrap:wrap;
 }
 
-.price{font-size:13px;opacity:.85}
+.price{
+font-size:13px;
+opacity:.85;
+}
 
-.buy{
+.actions{
+display:flex;
+gap:8px;
+}
+
+.buy,.download{
 border:none;
 padding:6px 14px;
 border-radius:12px;
-background:rgba(255,255,255,.15);
 color:#fff;
 cursor:pointer;
+transition:.25s;
 }
+
+.buy{
+background:rgba(255,255,255,.2);
+}
+
+.download{
+background:rgba(255,255,255,.08);
+}
+
+.buy:hover,.download:hover{
+background:rgba(255,255,255,.3);
+}
+
+/* FOOTER */
 
 .footer{
 text-align:center;
-padding:14px;
-opacity:.5;
+padding:16px;
 font-size:12px;
+opacity:.6;
+}
+
+.footer a{
+color:#fff;
+text-decoration:none;
+border-bottom:1px solid transparent;
+transition:.25s;
+}
+
+.footer a:hover{
+border-bottom:1px solid rgba(255,255,255,.4);
+opacity:1;
 }
 
 </style>
@@ -207,9 +250,14 @@ font-size:12px;
 </div>
 
 <div class="social" id="social"></div>
+
 <div class="beats" id="beats"></div>
 
-<div class="footer">Made by BULAVIN</div>
+<div class="footer">
+<a href="https://t.me/imbulavin" target="_blank">
+© <span id="year"></span> BULAVIN. All rights reserved.
+</a>
+</div>
 
 </div>
 
@@ -217,49 +265,21 @@ font-size:12px;
 
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-/* ===== REAL CSV PARSER ===== */
-
-function parseCSV(text){
-const rows=[];
-let row=[],cell="",q=false;
-
-for(let c of text){
-if(c=='"'){q=!q;continue;}
-if(c==','&&!q){row.push(cell);cell="";continue;}
-if(c=='\n'&&!q){row.push(cell);rows.push(row);row=[];cell="";continue;}
-cell+=c;
-}
-row.push(cell);
-rows.push(row);
-return rows;
-}
-
-/* GOOGLE IMAGE FIX */
-
-function fixImage(url){
-if(!url) return "";
-if(url.includes("drive.google.com")){
-const id=url.split("/d/")[1]?.split("/")[0];
-if(id) return `https://drive.google.com/uc?export=view&id=${id}`;
-}
-return url.trim();
-}
-
 let currentAudio=null;
 
 fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
-const rows=parseCSV(text);
-const p=rows[1];
+const rows=text.trim().split("\n").map(r=>r.split(","));
 
 /* PROFILE */
 
+const p=rows[1];
+
 const name=p[0];
 const desc=p[1];
-const photo=fixImage(p[2]);
-
+const photo=p[2];
 const tg=p[3];
 const ig=p[4];
 const yt=p[5];
@@ -269,22 +289,22 @@ const buyLink=p[7];
 nameEl.textContent=name;
 descEl.textContent=desc;
 
-hero.style.backgroundImage=`url("${photo}")`;
-bg.style.backgroundImage=`url("${photo}")`;
+hero.style.backgroundImage=`url(${photo})`;
+bg.style.backgroundImage=`url(${photo})`;
 
-/* SOCIALS */
+/* SOCIAL */
 
 [
 ["Telegram",tg],
 ["Instagram",ig],
 ["YouTube",yt],
 ["VK",vk]
-].forEach(([label,link])=>{
-if(!link)return;
+].forEach(s=>{
+if(!s[1])return;
 const a=document.createElement("a");
-a.href=link.trim();
+a.href=s[1];
 a.target="_blank";
-a.textContent=label;
+a.textContent=s[0];
 social.appendChild(a);
 });
 
@@ -310,7 +330,11 @@ beat.innerHTML=`
 <div class="price">
 MP3 ${r[2]}₽ | WAV ${r[3]}₽ | EXCL ${r[4]}₽
 </div>
+
+<div class="actions">
+<button class="download">Скачать</button>
 <button class="buy">Купить</button>
+</div>
 </div>
 `;
 
@@ -321,17 +345,14 @@ const bar=beat.querySelector(".bar");
 const progress=beat.querySelector(".progress");
 
 play.onclick=()=>{
-
-if(currentAudio&&currentAudio!==audio){
+if(currentAudio && currentAudio!==audio){
 currentAudio.pause();
-currentAudio._btn.textContent="▶";
 }
 
 if(audio.paused){
 audio.play();
 play.textContent="❚❚";
 currentAudio=audio;
-audio._btn=play;
 }else{
 audio.pause();
 play.textContent="▶";
@@ -339,7 +360,6 @@ play.textContent="▶";
 };
 
 audio.ontimeupdate=()=>{
-if(audio.duration)
 bar.style.width=(audio.currentTime/audio.duration*100)+"%";
 };
 
@@ -352,18 +372,25 @@ beat.querySelector(".buy").onclick=()=>{
 window.open(buyLink,"_blank");
 };
 
+beat.querySelector(".download").onclick=()=>{
+const a=document.createElement("a");
+a.href=r[5];
+a.download="";
+document.body.appendChild(a);
+a.click();
+a.remove();
+};
+
 beats.appendChild(beat);
 
 });
 
 });
 
-const nameEl=document.getElementById("name");
-const descEl=document.getElementById("desc");
-const hero=document.getElementById("hero");
-const bg=document.getElementById("bg");
-const social=document.getElementById("social");
-const beats=document.getElementById("beats");
+/* YEAR AUTO */
+
+document.getElementById("year").textContent=
+new Date().getFullYear();
 
 </script>
 
