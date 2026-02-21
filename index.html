@@ -1,217 +1,22 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>Beat Page</title>
-
-<style>
-
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-background:#000;
-display:flex;
-justify-content:center;
-padding:40px 10px;
-overflow-x:hidden;
-}
-
-/* BLUR BACKGROUND */
-body::before{
-content:"";
-position:fixed;
-inset:0;
-background-size:cover;
-background-position:center;
-filter:blur(80px) brightness(.4);
-z-index:-1;
-transform:scale(1.2);
-}
-
-/* APP */
-.app{
-width:100%;
-max-width:420px;
-background:rgba(15,15,15,.75);
-backdrop-filter:blur(20px);
-border-radius:30px;
-overflow:hidden;
-color:white;
-box-shadow:0 40px 120px rgba(0,0,0,.5);
-}
-
-/* HERO */
-
-.hero{
-height:260px;
-background-size:cover;
-background-position:center;
-display:flex;
-align-items:flex-end;
-padding:20px;
-position:relative;
-}
-
-.hero::after{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(to top,#000,transparent);
-}
-
-.hero-content{
-position:relative;
-z-index:2;
-}
-
-.hero h1{margin:0;font-size:22px;}
-.desc{opacity:.75;font-size:13px;margin-top:6px}
-
-/* SOCIALS */
-
-.socials{
-display:flex;
-gap:10px;
-padding:15px 20px;
-}
-
-.socials a{
-flex:1;
-text-align:center;
-padding:10px;
-border-radius:14px;
-background:rgba(255,255,255,.08);
-backdrop-filter:blur(10px);
-text-decoration:none;
-color:white;
-}
-
-/* BEATS */
-
-.beats{padding:10px 15px 20px;}
-
-.beat{
-background:rgba(255,255,255,.06);
-backdrop-filter:blur(12px);
-border-radius:18px;
-padding:15px;
-margin-bottom:14px;
-transition:.25s;
-}
-
-.beat:hover{
-background:rgba(255,255,255,.12);
-}
-
-.title{font-size:15px;font-weight:600;}
-.type{font-size:12px;opacity:.6;margin-bottom:10px;}
-
-.player{
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-.play{
-width:36px;height:36px;
-border-radius:50%;
-border:none;
-background:rgba(255,255,255,.1);
-color:white;
-cursor:pointer;
-}
-
-.progress{
-flex:1;
-height:4px;
-background:#333;
-border-radius:10px;
-cursor:pointer;
-position:relative;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:white;
-border-radius:10px;
-}
-
-.price{
-margin-top:10px;
-font-size:12px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.buy{
-padding:6px 14px;
-border-radius:12px;
-background:rgba(255,255,255,.12);
-text-decoration:none;
-color:white;
-}
-
-/* FOOTER */
-
-.footer{
-text-align:center;
-padding:20px;
-font-size:11px;
-opacity:.5;
-}
-
-.footer a{
-color:white;
-text-decoration:none;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="app">
-
-<div class="hero" id="hero">
-<div class="hero-content">
-<h1 id="artist"></h1>
-<div class="desc" id="description"></div>
-</div>
-</div>
-
-<div class="socials" id="socials"></div>
-
-<div class="beats" id="beats"></div>
-
-<div class="footer">
-Made by <a href="https://t.me/yourlink" target="_blank">BULAVIN</a>
-</div>
-
-</div>
-
 <script>
 
-const CSV_URL="PASTE_YOUR_CSV_LINK";
+const CSV_URL="ВСТАВЬ_СВОЙ_CSV";
 
-/* CSV parser */
+/* ===== НАДЁЖНЫЙ CSV ===== */
 function parseCSV(text){
 const rows=[];
 let row=[],value="",inside=false;
 
 for(let c of text){
 if(c=='"'){inside=!inside;continue;}
-if(c==","&&!inside){row.push(value);value="";continue;}
+if(c==","&&!inside){row.push(value.trim());value="";continue;}
 if((c=="\n"||c=="\r")&&!inside){
-if(value||row.length){row.push(value);rows.push(row);row=[];value="";}
+if(value||row.length){row.push(value.trim());rows.push(row);row=[];value="";}
 continue;
 }
 value+=c;
 }
-return rows;
+return rows.filter(r=>r.some(v=>v!==""));
 }
 
 let currentAudio=null;
@@ -221,40 +26,39 @@ fetch(CSV_URL)
 .then(text=>{
 
 const rows=parseCSV(text);
-const p=rows[1]||[];
+
+/* ---------- НАХОДИМ СТРОКУ ПРОФИЛЯ ---------- */
+
+const profile = rows.find(r => r[0] && r[0] !== "Название");
+
+/* ---------- НАХОДИМ БИТЫ ---------- */
+
+const beatStartIndex =
+rows.findIndex(r => r[0]==="Название");
+
+const beatsData = rows.slice(beatStartIndex+1);
 
 /* PROFILE */
 
-artist.textContent=p[0]||"";
-description.textContent=p[1]||"";
+artist.textContent = profile[0] || "";
+description.textContent = profile[1] || "";
 
-hero.style.backgroundImage=`url(${p[2]})`;
-document.body.style.setProperty("--bg",`url(${p[2]})`);
-document.body.style.backgroundImage=`url(${p[2]})`;
-document.body.style.backgroundSize="cover";
+if(profile[2]){
+hero.style.backgroundImage=`url(${profile[2]})`;
+document.body.style.backgroundImage=`url(${profile[2]})`;
+}
 
-document.body.style.setProperty("background-image",`url(${p[2]})`);
-document.body.style.setProperty("--hero",p[2]);
-
-document.body.style.setProperty("--heroimg",`url(${p[2]})`);
-document.body.style.backgroundImage=`url(${p[2]})`;
-document.body.style.backgroundAttachment="fixed";
-
-/* blur bg */
-document.body.style.setProperty("--bgimg",`url(${p[2]})`);
-document.body.style.backgroundImage=`url(${p[2]})`;
-document.body.style.backgroundPosition="center";
-
-/* socials */
+/* SOCIALS */
 
 const socialsData=[
-["Telegram",p[3]],
-["Instagram",p[4]],
-["YouTube",p[5]],
-["VK",p[6]]
+["Telegram",profile[3]],
+["Instagram",profile[4]],
+["YouTube",profile[5]],
+["VK",profile[6]]
 ];
 
 socials.innerHTML="";
+
 socialsData.forEach(s=>{
 if(!s[1])return;
 const a=document.createElement("a");
@@ -264,11 +68,14 @@ a.textContent=s[0];
 socials.appendChild(a);
 });
 
-const buyLink=p[7]||"#";
+const buyLink = profile[7] || "#";
 
-/* beats */
+/* BEATS */
 
-rows.slice(4).forEach(row=>{
+beats.innerHTML="";
+
+beatsData.forEach(row=>{
+
 if(!row[0])return;
 
 const beat=document.createElement("div");
@@ -284,7 +91,7 @@ beat.innerHTML=`
 </div>
 
 <div class="price">
-<span>MP3 ${row[2]}₽ | WAV ${row[3]}₽ | EXCL ${row[4]}₽</span>
+<span>MP3 ${row[2]||0}₽ | WAV ${row[3]||0}₽ | EXCL ${row[4]||0}₽</span>
 <a class="buy" href="${buyLink}" target="_blank">Купить</a>
 </div>
 `;
@@ -297,10 +104,11 @@ const bar=beat.querySelector(".bar");
 const progress=beat.querySelector(".progress");
 
 play.onclick=()=>{
-if(currentAudio&&currentAudio!==audio){
+if(currentAudio && currentAudio!==audio){
 currentAudio.pause();
 document.querySelectorAll(".play").forEach(b=>b.textContent="▶");
 }
+
 if(audio.paused){
 audio.play();
 play.textContent="❚❚";
@@ -317,6 +125,7 @@ bar.style.width=(audio.currentTime/audio.duration)*100+"%";
 };
 
 progress.onclick=e=>{
+if(!audio.duration) return;
 const r=progress.getBoundingClientRect();
 audio.currentTime=((e.clientX-r.left)/r.width)*audio.duration;
 };
@@ -324,7 +133,5 @@ audio.currentTime=((e.clientX-r.left)/r.width)*audio.duration;
 });
 
 });
-</script>
 
-</body>
-</html>
+</script>
