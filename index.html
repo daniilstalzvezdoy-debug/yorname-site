@@ -100,8 +100,20 @@ background:rgba(255,255,255,.06);
 transition:.35s;
 }
 
-.beats:hover .beat{opacity:.35;filter:blur(2px);}
-.beat:hover{opacity:1!important;transform:scale(1.02);}
+/* SMART HOVER */
+
+.beats .beat{transition:.35s;}
+
+.beats .beat:hover{
+transform:scale(1.02);
+z-index:2;
+}
+
+.beats .beat:hover ~ .beat,
+.beats .beat:has(~ .beat:hover){
+opacity:.35;
+filter:blur(2px);
+}
 
 /* PLAYER */
 
@@ -146,6 +158,12 @@ align-items:center;
 justify-content:space-between;
 margin-top:10px;
 width:100%;
+}
+
+.price{
+font-size:11px;
+opacity:.8;
+white-space:nowrap;
 }
 
 .actions{
@@ -220,8 +238,6 @@ text-decoration:none;
 
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-/* CSV PARSER */
-
 function parseCSV(text){
 const rows=[];
 let row=[],cell="",quotes=false;
@@ -249,15 +265,12 @@ fetch(CSV_URL)
 const rows=parseCSV(text);
 const p=rows[1];
 
-/* PROFILE FIX (главный фикс Loading) */
-
 document.getElementById("name").textContent=p[0];
 document.getElementById("desc").textContent=p[1];
 
-document.getElementById("hero").style.backgroundImage=`url(${p[2]})`;
-document.getElementById("bg").style.backgroundImage=`url(${p[2]})`;
+hero.style.backgroundImage=`url(${p[2]})`;
+bg.style.backgroundImage=`url(${p[2]})`;
 
-const social=document.getElementById("social");
 social.innerHTML="";
 
 [
@@ -274,7 +287,6 @@ a.textContent=label;
 social.appendChild(a);
 });
 
-const beats=document.getElementById("beats");
 beats.innerHTML="";
 
 rows.slice(4).reverse().forEach(r=>{
