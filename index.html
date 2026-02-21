@@ -116,8 +116,6 @@ overflow:hidden;
 isolation:isolate;
 }
 
-/* GLASS SHINE */
-
 .beat::before{
 content:"";
 position:absolute;
@@ -130,8 +128,6 @@ pointer-events:none;
 }
 
 .beat:hover::before{opacity:1}
-
-/* blur others */
 
 .beats:hover .beat{
 opacity:.35;
@@ -295,7 +291,7 @@ const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlU
 let currentAudio=null;
 let defaultBg="";
 
-/* SAFE CSV PARSER (не ломается от запятых) */
+/* SAFE CSV PARSER — НЕ ПРОПУСКАЕТ ПОСЛЕДНЮЮ СТРОКУ */
 function parseCSV(text){
 const rows=[];
 let row=[],cell="",inside=false;
@@ -303,17 +299,31 @@ let row=[],cell="",inside=false;
 for(let i=0;i<text.length;i++){
 const c=text[i];
 
-if(c=='"'){ inside=!inside; continue; }
+if(c=='"'){inside=!inside;continue;}
 
-if(c==',' && !inside){ row.push(cell); cell=""; continue; }
+if(c==',' && !inside){
+row.push(cell);
+cell="";
+continue;
+}
 
 if((c=='\n'||c=='\r') && !inside){
-if(cell||row.length){row.push(cell);rows.push(row);}
-row=[];cell="";continue;
+row.push(cell);
+rows.push(row);
+row=[];
+cell="";
+continue;
 }
 
 cell+=c;
 }
+
+/* 👇 ВАЖНО: добавляем последнюю строку */
+if(cell.length||row.length){
+row.push(cell);
+rows.push(row);
+}
+
 return rows;
 }
 
@@ -321,7 +331,6 @@ fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
-/* 🔥 FINAL GOOGLE FIX */
 text=text.replace(/^\uFEFF/,'');
 
 const rows=parseCSV(text)
@@ -358,7 +367,7 @@ const buyLink=p[7];
 
 rows.slice(4).forEach(r=>{
 
-if(!r[0])return;
+if(!r || !r[0]) return;
 
 const beat=document.createElement("div");
 beat.className="beat";
@@ -423,6 +432,7 @@ bg.style.backgroundImage=`url(${defaultBg})`;
 };
 
 audio.ontimeupdate=()=>{
+if(audio.duration)
 bar.style.width=(audio.currentTime/audio.duration*100)+"%";
 };
 
