@@ -1,188 +1,52 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Beat Page</title>
-
-<style>
-
-body{
-margin:0;
-font-family:system-ui;
-background:#eee;
-display:flex;
-justify-content:center;
-padding:40px 10px;
-}
-
-/* BLUR BACKGROUND */
-body::before{
-content:"";
-position:fixed;
-inset:0;
-background:url("https://avatars.yandex.net/get-music-content/16464214/8bceb93a.p.24009925/m1000x1000")
-center/cover;
-filter:blur(60px) brightness(.6);
-z-index:-1;
-}
-
-.app{
-width:420px;
-max-width:100%;
-background:#0b0b0b;
-color:white;
-border-radius:28px;
-overflow:hidden;
-box-shadow:0 30px 80px rgba(0,0,0,.5);
-}
-
-/* HERO */
-.hero{
-height:260px;
-background:url("https://avatars.yandex.net/get-music-content/16464214/8bceb93a.p.24009925/m1000x1000") center/cover;
-display:flex;
-align-items:flex-end;
-padding:20px;
-}
-
-.hero h1{
-margin:0;
-font-size:22px;
-}
-
-.hero p{
-margin:4px 0 0;
-opacity:.7;
-font-size:13px;
-}
-
-.section{
-padding:18px;
-}
-
-.beat{
-background:rgba(255,255,255,.05);
-border-radius:18px;
-padding:14px;
-margin-bottom:14px;
-backdrop-filter:blur(20px);
-transition:.3s;
-}
-
-.beat:hover{
-background:rgba(255,255,255,.1);
-}
-
-.play{
-width:36px;
-height:36px;
-border-radius:50%;
-border:none;
-background:#1f1f1f;
-color:white;
-cursor:pointer;
-}
-
-.progress{
-width:100%;
-height:4px;
-background:#333;
-border-radius:3px;
-margin:10px 0;
-cursor:pointer;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:white;
-border-radius:3px;
-}
-
-.price{
-font-size:12px;
-opacity:.8;
-}
-
-.buy{
-float:right;
-background:rgba(255,255,255,.1);
-border:none;
-padding:6px 12px;
-border-radius:12px;
-color:white;
-cursor:pointer;
-}
-
-footer{
-text-align:center;
-opacity:.5;
-font-size:12px;
-padding:20px;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="app">
-
-<div class="hero">
-<div>
-<h1 id="artist">Loading...</h1>
-<p id="desc"></p>
-</div>
-</div>
-
-<div class="section" id="beats"></div>
-
-<footer>Made by BULAVIN</footer>
-
-</div>
-
 <script>
 
-/* ===========================
-   ВСТАВЬ СВОЙ CSV СЮДА
-=========================== */
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
-
-/* =========================== */
-
+/* load csv */
 fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
-const rows=text.trim().split("\n").slice(1);
+const lines=text.trim().split("\n").map(l=>l.split(","));
 
-const beatsContainer=document.getElementById("beats");
-if(!beatsContainer) return;
+/* ========= META ========= */
 
-rows.forEach(row=>{
+const meta={};
 
-const cols=row.split(",");
+for(let i=0;i<4;i++){
+meta[lines[i][0]]=lines[i][1];
+}
 
-const title=cols[0];
-const type=cols[1];
-const mp3=cols[2];
-const wav=cols[3];
-const exc=cols[4];
-const url=cols[5];
+document.getElementById("artist").textContent=meta.artist;
+document.getElementById("desc").textContent=meta.description;
 
-if(!url) return;
+/* photo everywhere */
+document.querySelector(".hero").style.backgroundImage=`url(${meta.photo})`;
+document.body.style.setProperty(
+'--bg',
+`url(${meta.photo})`
+);
+
+/* ========= BEATS ========= */
+
+const headerIndex=lines.findIndex(r=>r[0]==="title");
+const beats=lines.slice(headerIndex+1);
+
+const container=document.getElementById("beats");
+
+beats.forEach(row=>{
+
+const [title,type,mp3,wav,exc,file]=row;
+if(!file) return;
 
 const beat=document.createElement("div");
 beat.className="beat";
 
 beat.innerHTML=`
-<div><b>${title}</b><br><small>${type}</small></div>
+<b>${title}</b><br>
+<small>${type}</small>
 
 <button class="play">▶</button>
-
 <div class="progress"><div class="bar"></div></div>
 
 <div class="price">
@@ -191,21 +55,22 @@ MP3 ${mp3}₽ | WAV ${wav}₽ | EXCL ${exc}₽
 </div>
 `;
 
-beatsContainer.appendChild(beat);
+container.appendChild(beat);
 
-const audio=new Audio(url);
+const audio=new Audio(file);
 
-const playBtn=beat.querySelector(".play");
+const play=beat.querySelector(".play");
 const bar=beat.querySelector(".bar");
-const progress=beat.querySelector(".progress");
+const prog=beat.querySelector(".progress");
+const buy=beat.querySelector(".buy");
 
-playBtn.onclick=()=>{
+play.onclick=()=>{
 if(audio.paused){
 audio.play();
-playBtn.textContent="❚❚";
+play.textContent="❚❚";
 }else{
 audio.pause();
-playBtn.textContent="▶";
+play.textContent="▶";
 }
 };
 
@@ -213,20 +78,17 @@ audio.ontimeupdate=()=>{
 bar.style.width=(audio.currentTime/audio.duration*100)+"%";
 };
 
-progress.onclick=e=>{
-const rect=progress.getBoundingClientRect();
-const percent=(e.clientX-rect.left)/rect.width;
-audio.currentTime=percent*audio.duration;
+prog.onclick=e=>{
+const rect=prog.getBoundingClientRect();
+audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;
+};
+
+buy.onclick=()=>{
+window.open(meta.buy_link,"_blank");
 };
 
 });
 
-})
-.catch(err=>{
-console.error("CSV LOAD ERROR:",err);
 });
 
 </script>
-
-</body>
-</html>
