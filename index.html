@@ -8,73 +8,137 @@
 <style>
 *{box-sizing:border-box}
 body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-    background:#f3f3f3;
-    display:flex;
-    justify-content:center;
-    padding:40px 10px;
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+background:#f3f3f3;
+display:flex;
+justify-content:center;
+padding:40px 10px;
 }
+
+/* APP CARD */
 .app{
-    width:100%;
-    max-width:430px;
-    border-radius:32px;
-    overflow:hidden;
-    background:#0b0b0b;
-    color:white;
-    box-shadow:0 40px 120px rgba(0,0,0,0.4);
+width:100%;
+max-width:430px;
+border-radius:32px;
+overflow:hidden;
+background:#0b0b0b;
+color:white;
+box-shadow:0 40px 120px rgba(0,0,0,0.35);
 }
 
 /* HERO */
 .hero{
-    height:280px;
-    background:url("https://avatars.yandex.net/get-music-content/16464214/8bceb93a.p.24009925/m1000x1000") center/cover;
-    display:flex;
-    align-items:flex-end;
-    padding:20px;
-    position:relative;
+height:280px;
+background:url("https://avatars.yandex.net/get-music-content/16464214/8bceb93a.p.24009925/m1000x1000") center/cover;
+display:flex;
+align-items:flex-end;
+padding:20px;
+position:relative;
 }
 .hero::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(to top,rgba(0,0,0,0.85),transparent);
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(to top,rgba(0,0,0,0.85),transparent);
 }
-.hero-content{position:relative;z-index:2;}
-.hero h1{margin:0;font-size:22px}
-.hero p{font-size:13px;opacity:0.7;margin-top:6px}
+.hero-content{
+position:relative;
+z-index:2;
+}
+.hero h1{
+margin:0;
+font-size:22px;
+}
+.hero p{
+font-size:13px;
+opacity:0.7;
+margin-top:6px;
+}
 
 /* SECTION */
-.section{padding:20px}
-.section:hover .beat{opacity:0.35}
-.section .beat:hover{opacity:1}
+.section{
+padding:20px;
+}
+.section:hover .beat{
+opacity:0.35;
+}
+.section .beat:hover{
+opacity:1;
+}
 
 /* BEAT */
-.beat{margin-bottom:25px;transition:0.3s}
-.beat-title{font-size:14px;margin-bottom:4px}
-.beat-type{font-size:12px;opacity:0.6;margin-bottom:10px}
-.player{display:flex;align-items:center;gap:10px}
-.play{
-    width:36px;height:36px;border-radius:50%;
-    border:none;background:rgba(255,255,255,0.15);
-    color:white;cursor:pointer;transition:0.2s;
+.beat{
+margin-bottom:28px;
+transition:0.3s ease;
 }
-.play.active{box-shadow:0 0 15px rgba(255,255,255,0.7)}
-.wave{
-    flex:1;height:6px;background:rgba(255,255,255,0.2);
-    border-radius:4px;position:relative;cursor:pointer;
+.beat-title{
+font-size:15px;
+margin-bottom:4px;
 }
-.progress{height:100%;width:0%;background:white}
+.beat-type{
+font-size:12px;
+opacity:0.6;
+margin-bottom:10px;
+}
 
-.bottom{
-    display:flex;justify-content:space-between;
-    align-items:center;margin-top:10px;font-size:12px;
+/* PLAYER */
+.player{
+display:flex;
+align-items:center;
+gap:10px;
 }
+
+.play{
+width:38px;
+height:38px;
+border-radius:50%;
+border:none;
+background:rgba(255,255,255,0.12);
+color:white;
+cursor:pointer;
+transition:0.2s;
+font-size:14px;
+}
+.play.active{
+box-shadow:0 0 15px rgba(255,255,255,0.7);
+}
+
+.wave{
+flex:1;
+height:6px;
+background:rgba(255,255,255,0.2);
+border-radius:4px;
+position:relative;
+cursor:pointer;
+}
+.progress{
+height:100%;
+width:0%;
+background:white;
+border-radius:4px;
+}
+
+/* BOTTOM */
+.bottom{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:12px;
+font-size:12px;
+}
+
 .buy{
-    padding:6px 12px;border-radius:14px;
-    background:rgba(255,255,255,0.15);
-    border:1px solid rgba(255,255,255,0.25);
-    color:white;text-decoration:none;
+padding:6px 12px;
+border-radius:14px;
+background:rgba(255,255,255,0.12);
+border:1px solid rgba(255,255,255,0.25);
+color:white;
+text-decoration:none;
+transition:0.2s;
+}
+.buy:hover{
+background:rgba(255,255,255,0.2);
 }
 </style>
 </head>
@@ -83,10 +147,10 @@ body{
 <div class="app">
 
 <div class="hero">
-    <div class="hero-content">
-        <h1>YorName ✔</h1>
-        <p>Немного о тебе / credits (с кем работал)</p>
-    </div>
+<div class="hero-content">
+<h1>YorName ✔</h1>
+<p>Немного о тебе / credits (с кем работал)</p>
+</div>
 </div>
 
 <div class="section" id="beats"></div>
@@ -94,104 +158,88 @@ body{
 </div>
 
 <script>
-const SHEET_ID="19GH9QrybjzACLVvVaEzKbBIlATZ61eHdFNmpDNxHhUY";
-const tgUsername="username";
-let currentAudio=null;
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
+const tgUsername = "username"; // <-- поменяй на реальный
 
-// Преобразует Drive-ссылки в прямые
-function convertDrive(url){
-    if(!url) return "";
-    if(url.includes("drive.google.com")){
-        const id=url.split("/d/")[1]?.split("/")[0];
-        return `https://drive.google.com/uc?export=download&id=${id}`;
-    }
-    return url;
+let currentAudio = null;
+
+fetch(CSV_URL)
+.then(res => res.text())
+.then(text => {
+const rows = text.trim().split("\n").slice(1);
+const container = document.getElementById("beats");
+
+rows.forEach(row => {
+
+const cols = row.split(",");
+if(cols.length < 6) return;
+
+const [title,type,mp3,wav,exclusive,file] = cols;
+
+const beat = document.createElement("div");
+beat.className = "beat";
+
+beat.innerHTML = `
+<div class="beat-title">${title}</div>
+<div class="beat-type">${type}</div>
+
+<div class="player">
+<button class="play">▶</button>
+<div class="wave">
+<div class="progress"></div>
+</div>
+</div>
+
+<div class="bottom">
+<div>MP3 ${mp3}₽ | WAV ${wav}₽ | EXCL ${exclusive}₽</div>
+<a class="buy" href="https://t.me/${tgUsername}?text=Хочу купить ${encodeURIComponent(title)}">Купить</a>
+</div>
+
+<audio preload="metadata" src="${file}"></audio>
+`;
+
+container.appendChild(beat);
+
+const audio = beat.querySelector("audio");
+const btn = beat.querySelector(".play");
+const wave = beat.querySelector(".wave");
+const progress = beat.querySelector(".progress");
+
+btn.onclick = () => {
+
+if(currentAudio && currentAudio !== audio){
+currentAudio.pause();
+currentAudio.parentElement.querySelector(".play").textContent = "▶";
+currentAudio.parentElement.querySelector(".play").classList.remove("active");
 }
 
-// Берёт чистый JSON из gviz ответа
-function parseGViz(text){
-    const json = text.substring(text.indexOf("{"), text.lastIndexOf("}")+1);
-    return JSON.parse(json);
+if(audio.paused){
+audio.play();
+btn.textContent = "⏸";
+btn.classList.add("active");
+currentAudio = audio;
+}else{
+audio.pause();
+btn.textContent = "▶";
+btn.classList.remove("active");
 }
+};
 
-// Рендерит биты
-function render(rows){
-    const container=document.getElementById("beats");
-
-    rows.forEach(row=>{
-        const title=row[0]||"";
-        const type=row[1]||"";
-        const mp3=row[2]||"";
-        const wav=row[3]||"";
-        const exclusive=row[4]||"";
-        const file=row[5]||"";
-
-        const audioUrl=convertDrive(file);
-
-        const beat=document.createElement("div");
-        beat.className="beat";
-        beat.innerHTML=`
-            <div class="beat-title">${title}</div>
-            <div class="beat-type">${type}</div>
-            <div class="player">
-                <button class="play">▶</button>
-                <div class="wave"><div class="progress"></div></div>
-            </div>
-            <div class="bottom">
-                <div>MP3 ${mp3}₽ | WAV ${wav}₽ | EXCL ${exclusive}₽</div>
-                <a class="buy" href="https://t.me/${tgUsername}?text=Хочу%20купить%20${encodeURIComponent(title)}">Купить</a>
-            </div>
-            <audio preload="metadata" src="${audioUrl}"></audio>
-        `;
-        container.appendChild(beat);
-
-        const audio=beat.querySelector("audio");
-        const btn=beat.querySelector(".play");
-        const wave=beat.querySelector(".wave");
-        const progress=beat.querySelector(".progress");
-
-        btn.onclick=()=>{
-            if(currentAudio && currentAudio!==audio){
-                const prevBtn=currentAudio.parentElement.querySelector(".play");
-                prevBtn.textContent="▶";
-                prevBtn.classList.remove("active");
-                currentAudio.pause();
-            }
-            if(audio.paused){
-                audio.play();
-                btn.textContent="⏸";
-                btn.classList.add("active");
-                currentAudio=audio;
-            }else{
-                audio.pause();
-                btn.textContent="▶";
-                btn.classList.remove("active");
-            }
-        };
-
-        audio.addEventListener("timeupdate",()=>{
-            if(audio.duration){
-                progress.style.width=(audio.currentTime/audio.duration)*100+"%";
-            }
-        });
-
-        wave.addEventListener("click",(e)=>{
-            if(!audio.duration) return;
-            const rect=wave.getBoundingClientRect();
-            const percent=(e.clientX-rect.left)/rect.width;
-            audio.currentTime=percent*audio.duration;
-        });
-    });
+audio.addEventListener("timeupdate", () => {
+if(audio.duration){
+progress.style.width = (audio.currentTime / audio.duration) * 100 + "%";
 }
+});
 
-// Подгружаем таблицу через gviz JSON
-fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
-.then(res=>res.text())
-.then(text=>{
-    const data=parseGViz(text);
-    const rows = data.table.rows.map(r=>r.c.map(c=>c?.v));
-    rows.shift(); // убираем заголовки
-    render(rows);
+wave.addEventListener("click", (e) => {
+if(!audio.duration) return;
+const rect = wave.getBoundingClientRect();
+const percent = (e.clientX - rect.left) / rect.width;
+audio.currentTime = percent * audio.duration;
+});
+
+});
+
 });
 </script>
 
