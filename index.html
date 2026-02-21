@@ -7,7 +7,7 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#050505;color:#fff;display:flex;justify-content:center;padding:40px 12px; transition: 0.5s;}
+body{background:#0b0b0b;color:#fff;display:flex;justify-content:center;padding:40px 12px}
 
 .bg{
 position:fixed;inset:0;
@@ -27,12 +27,12 @@ filter:blur(50px) brightness(.6);
 .app{
 width:520px;max-width:100%;
 border-radius:32px;
-overflow:visible; /* Чтобы карточки могли вылезать за пределы */
 background:rgba(255,255,255,.03);
 backdrop-filter:blur(40px) saturate(180%);
 -webkit-backdrop-filter:blur(40px) saturate(180%);
 border:1px solid rgba(255,255,255,0.08);
 box-shadow:0 30px 100px rgba(0,0,0,0.8);
+position: relative;
 }
 
 .hero{
@@ -51,12 +51,12 @@ overflow:hidden;
 content:"";
 position:absolute;
 inset:0;
-background:linear-gradient(to top, rgba(5,5,5,0.9), transparent);
+background:linear-gradient(to top, rgba(11,11,11,1), transparent);
 }
 
 .hero-text{position:relative;z-index:2}
 .hero h1{font-size:28px; letter-spacing: -0.5px}
-.hero p{opacity:.7; margin-top:4px; font-size: 15px}
+.hero p{opacity:.8; margin-top:4px; font-size: 15px}
 
 .social{
 display:flex; gap:10px; overflow-x:auto; padding:16px 20px;
@@ -66,37 +66,36 @@ scrollbar-width: none;
 
 .social a{
 white-space:nowrap; padding:10px 18px; border-radius:16px;
-background:rgba(255,255,255,.06);
+background:rgba(255,255,255,.08);
 border: 1px solid rgba(255,255,255,0.05);
 text-decoration:none; color:#fff; font-size: 13px; font-weight: 500;
 transition: 0.3s;
 }
-.social a:hover { background:rgba(255,255,255,.12); transform: translateY(-2px); }
+.social a:hover { background:rgba(255,255,255,.15); transform: translateY(-2px); }
 
 .beats{padding:10px 16px 30px; display:flex; flex-direction:column; gap:16px}
 
 /* ЭФФЕКТ РАЗМЫТИЯ ОСТАЛЬНЫХ БИТОВ ПРИ НАВЕДЕНИИ */
 .beats:hover .beat:not(:hover) {
-    filter: blur(4px);
+    filter: blur(5px);
     opacity: 0.5;
-    transform: scale(0.98);
+    transform: scale(0.97);
 }
 
 .beat{
 padding:20px;
 border-radius:24px;
-background: rgba(255,255,255, 0.04);
+background: rgba(255,255,255, 0.05);
 border: 1px solid rgba(255,255,255, 0.05);
 transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 position:relative;
-cursor: pointer;
 }
 
-/* АНИМАЦИЯ "ВЫЛЕТА" НА ТЕБЯ */
+/* АНИМАЦИЯ "ВЫЛЕТА" */
 .beat:hover {
-    background: rgba(255,255,255, 0.08);
+    background: rgba(255,255,255, 0.1);
     transform: scale(1.04) translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     border: 1px solid rgba(255,255,255, 0.15);
     z-index: 10;
 }
@@ -105,7 +104,7 @@ cursor: pointer;
 content:"";
 position:absolute;
 inset:0;
-background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.1),transparent 80%);
+background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.12),transparent 80%);
 opacity:0;
 transition:.4s;
 pointer-events:none;
@@ -113,40 +112,38 @@ pointer-events:none;
 .beat:hover::before{opacity:1}
 
 .title{font-weight:700; font-size: 18px; display:flex; flex-wrap:wrap; gap:8px; align-items: center;}
-.meta{font-size:12px; color:#ff6b6b; font-weight: 400; background: rgba(255,107,107,0.1); padding: 2px 8px; border-radius: 8px;}
-.artist{font-size:14px; opacity:.5; margin-top:4px}
+.meta{font-size:12px; color:#ff8c8c; font-weight: 400;}
+.artist{font-size:14px; opacity:.6; margin-top:2px}
 
 .player{display:flex; align-items:center; gap:12px; margin-top:16px}
 
 .play{
-width:42px; height:42px; border-radius:50%;
-border:none; background:#fff; color:#000;
+width:40px; height:40px; border-radius:50%;
+border:none; background:rgba(255,255,255,0.15); color:#fff;
 cursor:pointer; font-size: 12px;
 display: flex; align-items: center; justify-content: center;
 transition: 0.3s;
 }
-.play:hover { transform: scale(1.1); }
+.play:hover { background: #fff; color: #000; }
 
-.progress{flex:1; height:6px; background:rgba(255,255,255,0.1); border-radius:10px; cursor:pointer; position: relative; overflow: hidden;}
-.bar{height:100%; width:0%; background:#fff; border-radius:10px; transition: width 0.1s linear}
+.progress{flex:1; height:4px; background:rgba(255,255,255,0.1); border-radius:10px; cursor:pointer; position: relative;}
+.bar{height:100%; width:0%; background:#fff; border-radius:10px;}
 
-.bottom{display:flex; justify-content:space-between; align-items: center; margin-top:20px; gap:10px}
-.price{font-size:11px; font-weight: 700; opacity:.9; letter-spacing: 0.5px}
+.bottom{display:flex; justify-content:space-between; align-items: center; margin-top:16px; gap:10px}
+.price{font-size:11px; font-weight: 600; opacity:.8; white-space: nowrap;}
 
-.actions{display:flex; gap:10px}
+.actions{display:flex; gap:8px}
 
 .download, .buy{
-border:none; padding:10px 18px; border-radius:14px; color:#fff; cursor:pointer; font-size: 12px; font-weight: 600; transition: 0.3s;
+border:none; padding:8px 16px; border-radius:12px; color:#fff; cursor:pointer; font-size: 12px; font-weight: 600; transition: 0.3s;
 }
 
-.download{background:rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,0.05)}
-.buy{background:#fff; color:#000}
+.download{background:rgba(255,255,255,.12)}
+.buy{background:rgba(255,80,80,.9)} /* ТА САМАЯ КРАСНАЯ КНОПКА */
+.buy:hover{background:rgba(255,50,50,1); transform: scale(1.05);}
 
-.download:hover { background: rgba(255,255,255,0.15); }
-.buy:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.3); }
-
-.footer{text-align:center; padding:30px; font-size:11px; opacity:.4; letter-spacing: 1px}
-.footer a{color:#fff; text-decoration:none; font-weight: 700;}
+.footer{text-align:center; padding:20px; font-size:11px; opacity:.5}
+.footer a{color:#fff; text-decoration:none; font-weight: 600;}
 </style>
 </head>
 
@@ -155,19 +152,19 @@ border:none; padding:10px 18px; border-radius:14px; color:#fff; cursor:pointer; 
 <div class="bg" id="bg"></div>
 
 <div class="app">
-<div class="hero" id="hero">
-<div class="hero-text">
-<h1 id="name">Loading...</h1>
-<p id="desc"></p>
-</div>
-</div>
+    <div class="hero" id="hero">
+        <div class="hero-text">
+            <h1 id="name">Loading...</h1>
+            <p id="desc"></p>
+        </div>
+    </div>
 
-<div class="social" id="social"></div>
-<div class="beats" id="beats"></div>
+    <div class="social" id="social"></div>
+    <div class="beats" id="beats"></div>
 
-<div class="footer">
-© <a href="https://t.me/imbulavin" target="_blank">BULAVIN SYSTEM</a>
-</div>
+    <div class="footer">
+        © <a href="https://t.me/imbulavin" target="_blank">BULAVIN SYSTEM</a>
+    </div>
 </div>
 
 <script>
@@ -209,7 +206,8 @@ fetch(CSV_URL)
     }
 
     const socialContainer = document.getElementById('social');
-    [["TG", p[3]], ["INST", p[4]], ["YT", p[5]], ["VK", p[6]]].forEach(s => {
+    // ВОЗВРАЩАЕМ ПОЛНЫЕ НАЗВАНИЯ
+    [["Telegram", p[3]], ["Instagram", p[4]], ["YouTube", p[5]], ["VK", p[6]]].forEach(s => {
         if (s[1] && s[1].includes('http')) {
             const a = document.createElement("a");
             a.href = s[1]; a.target = "_blank"; a.textContent = s[0];
@@ -225,14 +223,14 @@ fetch(CSV_URL)
         const beat = document.createElement("div");
         beat.className = "beat";
         beat.innerHTML = `
-            <div class="title">${r[0]} <span class="meta">${r[2] || '0'} BPM</span></div>
+            <div class="title">${r[0]} <span class="meta">| ${r[2] || '0'} BPM | ${r[3] || ''}</span></div>
             <div class="artist">${r[1] || ""}</div>
             <div class="player">
                 <button class="play">▶</button>
                 <div class="progress"><div class="bar"></div></div>
             </div>
             <div class="bottom">
-                <div class="price">MP3 ${r[4]} | WAV ${r[5]} | EXCL ${r[6]}</div>
+                <div class="price">MP3 ${r[4]}₽ | WAV ${r[5]}₽ | EXCL ${r[6]}₽</div>
                 <div class="actions">
                     <button class="download">MP3</button>
                     <button class="buy">КУПИТЬ</button>
@@ -245,15 +243,14 @@ fetch(CSV_URL)
         const bar = beat.querySelector(".bar");
         const progress = beat.querySelector(".progress");
 
-        playBtn.onclick = (e) => {
-            e.stopPropagation();
+        playBtn.onclick = () => {
             if (currentAudio && currentAudio !== audio) {
                 currentAudio.pause();
                 currentBtn.textContent = "▶";
             }
             if (audio.paused) {
                 audio.play();
-                playBtn.textContent = "II";
+                playBtn.textContent = "❚❚";
                 currentAudio = audio;
                 currentBtn = playBtn;
                 document.getElementById('bg').classList.add("playing");
@@ -274,13 +271,12 @@ fetch(CSV_URL)
         };
 
         progress.onclick = e => {
-            e.stopPropagation();
             const rect = progress.getBoundingClientRect();
             audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
         };
 
-        beat.querySelector(".buy").onclick = (e) => { e.stopPropagation(); window.open(buyLink, "_blank"); };
-        beat.querySelector(".download").onclick = (e) => { e.stopPropagation(); window.open(r[7], "_blank"); };
+        beat.querySelector(".buy").onclick = () => window.open(buyLink, "_blank");
+        beat.querySelector(".download").onclick = () => window.open(r[7], "_blank");
 
         document.getElementById('beats').appendChild(beat);
     });
