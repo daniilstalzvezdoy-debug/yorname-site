@@ -89,11 +89,6 @@ border-radius:14px;
 background:rgba(255,255,255,.08);
 text-decoration:none;
 color:#fff;
-transition:.25s;
-}
-
-.social a:hover{
-background:rgba(255,255,255,.18);
 }
 
 /* BEATS */
@@ -113,89 +108,28 @@ backdrop-filter:blur(25px);
 transition:.35s;
 position:relative;
 overflow:hidden;
-isolation:isolate;
 }
 
-.beat::before{
-content:"";
-position:absolute;
-inset:0;
-border-radius:inherit;
-background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.18),transparent 70%);
-opacity:0;
-transition:.4s;
-pointer-events:none;
-}
+.beats:hover .beat{opacity:.35;filter:blur(2px);}
+.beats:hover .beat:hover{opacity:1;filter:none;transform:translateY(-3px) scale(1.02);}
 
-.beat:hover::before{opacity:1}
+.title{font-weight:600;display:flex;flex-wrap:wrap;gap:6px;}
+.meta{font-size:13px;opacity:.75;color:#ff8c8c;}
+.artist{font-size:14px;opacity:.7;margin-top:2px;}
 
-.beats:hover .beat{
-opacity:.35;
-filter:blur(2px);
-}
-
-.beats:hover .beat:hover{
-opacity:1;
-filter:none;
-transform:translateY(-3px) scale(1.02);
-}
-
-/* TEXT */
-
-.title{
-font-weight:600;
-display:flex;
-flex-wrap:wrap;
-gap:6px;
-}
-
-.meta{
-font-size:13px;
-opacity:.75;
-color:#ff8c8c;
-}
-
-.artist{
-font-size:14px;
-opacity:.7;
-margin-top:2px;
-}
-
-/* PLAYER */
-
-.player{
-display:flex;
-align-items:center;
-gap:10px;
-margin-top:10px;
-}
+.player{display:flex;align-items:center;gap:10px;margin-top:10px;}
 
 .play{
-width:36px;
-height:36px;
-border-radius:50%;
-border:none;
-background:rgba(255,255,255,.15);
-color:#fff;
-cursor:pointer;
+width:36px;height:36px;border-radius:50%;
+border:none;background:rgba(255,255,255,.15);
+color:#fff;cursor:pointer;
 }
 
 .progress{
-flex:1;
-height:4px;
-background:#444;
-border-radius:10px;
-cursor:pointer;
+flex:1;height:4px;background:#444;border-radius:10px;cursor:pointer;
 }
 
-.bar{
-height:100%;
-width:0%;
-background:#fff;
-border-radius:10px;
-}
-
-/* BOTTOM */
+.bar{height:100%;width:0%;background:#fff;border-radius:10px;}
 
 .bottom{
 display:flex;
@@ -204,60 +138,25 @@ justify-content:space-between;
 margin-top:12px;
 gap:10px;
 flex-wrap:wrap;
-row-gap:10px;
 }
 
-.price{
-font-size:12px;
-opacity:.85;
-white-space:nowrap;
-}
+.price{font-size:12px;opacity:.85;white-space:nowrap;}
 
-.actions{
-display:flex;
-gap:8px;
-margin-left:auto;
-}
+.actions{display:flex;gap:8px;margin-left:auto;}
 
-.download{
-border:none;
-padding:6px 12px;
-border-radius:12px;
-background:rgba(255,255,255,.12);
-color:#fff;
-cursor:pointer;
-}
-
-.buy{
+.download,.buy{
 border:none;
 padding:6px 14px;
 border-radius:12px;
-background:rgba(255,80,80,.9);
-color:#fff;
 cursor:pointer;
-}
-
-@media (max-width:480px){
-.actions{
-width:100%;
-justify-content:flex-end;
-margin-top:6px;
-}
-}
-
-/* FOOTER */
-
-.footer{
-text-align:center;
-padding:16px;
-font-size:12px;
-opacity:.6;
-}
-
-.footer a{
 color:#fff;
-text-decoration:none;
 }
+
+.download{background:rgba(255,255,255,.12);}
+.buy{background:rgba(255,80,80,.9);}
+
+.footer{text-align:center;padding:16px;font-size:12px;opacity:.6;}
+.footer a{color:#fff;text-decoration:none;}
 
 </style>
 </head>
@@ -291,7 +190,7 @@ const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlU
 let currentAudio=null;
 let defaultBg="";
 
-/* SAFE CSV PARSER — НЕ ПРОПУСКАЕТ ПОСЛЕДНЮЮ СТРОКУ */
+/* ✅ СТАРЫЙ ПАРСЕР + ФИКС ПОСЛЕДНЕЙ СТРОКИ */
 function parseCSV(text){
 const rows=[];
 let row=[],cell="",inside=false;
@@ -301,24 +200,19 @@ const c=text[i];
 
 if(c=='"'){inside=!inside;continue;}
 
-if(c==',' && !inside){
-row.push(cell);
-cell="";
-continue;
-}
+if(c==',' && !inside){row.push(cell);cell="";continue;}
 
 if((c=='\n'||c=='\r') && !inside){
 row.push(cell);
 rows.push(row);
-row=[];
-cell="";
+row=[];cell="";
 continue;
 }
 
 cell+=c;
 }
 
-/* 👇 ВАЖНО: добавляем последнюю строку */
+/* ⭐ ГЛАВНЫЙ ФИКС */
 if(cell.length||row.length){
 row.push(cell);
 rows.push(row);
@@ -333,19 +227,16 @@ fetch(CSV_URL)
 
 text=text.replace(/^\uFEFF/,'');
 
-const rows=parseCSV(text)
-.map(r=>r.map(c=>c.replace(/^\uFEFF/,'').trim()));
+const rows=parseCSV(text);
 
 const p=rows[1]||[];
 
-document.getElementById("name").textContent=p[0]||"YourName";
-document.getElementById("desc").textContent=p[1]||"";
+name.textContent=p[0]||"YourName";
+desc.textContent=p[1]||"";
 
 hero.style.backgroundImage=`url(${p[2]})`;
 bg.style.backgroundImage=`url(${p[2]})`;
 defaultBg=p[2];
-
-/* SOCIALS */
 
 [
 ["Telegram",p[3]],
@@ -363,21 +254,15 @@ social.appendChild(a);
 
 const buyLink=p[7];
 
-/* BEATS */
-
 rows.slice(4).forEach(r=>{
 
-if(!r || !r[0]) return;
+if(!r||!r[0])return;
 
 const beat=document.createElement("div");
 beat.className="beat";
 
 beat.innerHTML=`
-<div class="title">
-${r[0]}
-<span class="meta">| ${r[2]} BPM | ${r[3]}</span>
-</div>
-
+<div class="title">${r[0]} <span class="meta">| ${r[2]} BPM | ${r[3]}</span></div>
 <div class="artist">${r[1]||""}</div>
 
 <div class="player">
@@ -386,10 +271,7 @@ ${r[0]}
 </div>
 
 <div class="bottom">
-<div class="price">
-MP3 ${r[4]}₽ | WAV ${r[5]}₽ | EXCL ${r[6]}₽
-</div>
-
+<div class="price">MP3 ${r[4]}₽ | WAV ${r[5]}₽ | EXCL ${r[6]}₽</div>
 <div class="actions">
 <button class="download">Скачать</button>
 <button class="buy">Купить</button>
@@ -404,7 +286,6 @@ const bar=beat.querySelector(".bar");
 const progress=beat.querySelector(".progress");
 
 playBtn.onclick=()=>{
-
 if(currentAudio && currentAudio!==audio){
 currentAudio.pause();
 currentAudio.btn.textContent="▶";
@@ -423,12 +304,6 @@ playBtn.textContent="▶";
 bg.classList.remove("playing");
 bg.style.backgroundImage=`url(${defaultBg})`;
 }
-};
-
-audio.onended=()=>{
-playBtn.textContent="▶";
-bg.classList.remove("playing");
-bg.style.backgroundImage=`url(${defaultBg})`;
 };
 
 audio.ontimeupdate=()=>{
