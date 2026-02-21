@@ -11,11 +11,10 @@
 
 body{
 background:#0b0b0b;
-min-height:100vh;
+color:#fff;
 display:flex;
 justify-content:center;
-align-items:center;
-color:#fff;
+padding:40px 12px;
 }
 
 /* BACKGROUND */
@@ -25,7 +24,7 @@ position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(60px) brightness(.6);
+filter:blur(60px) brightness(.55);
 transform:scale(1.2);
 z-index:-1;
 }
@@ -33,8 +32,8 @@ z-index:-1;
 /* APP */
 
 .app{
-width:420px;
-max-width:95%;
+width:520px;
+max-width:100%;
 border-radius:28px;
 overflow:hidden;
 background:rgba(20,20,20,.55);
@@ -45,42 +44,45 @@ box-shadow:0 25px 90px rgba(0,0,0,.7);
 /* HERO */
 
 .hero{
-height:240px;
+height:260px;
 background-size:cover;
 background-position:center;
 display:flex;
 align-items:flex-end;
-padding:20px;
+padding:22px;
 position:relative;
 }
 
-.hero::after{
+.hero:after{
 content:"";
 position:absolute;
 inset:0;
-background:linear-gradient(to top,rgba(0,0,0,.85),transparent 60%);
+background:linear-gradient(to top,rgba(0,0,0,.85),transparent);
 }
 
-.hero-text{position:relative;z-index:2}
+.hero-text{
+position:relative;
+z-index:2;
+}
 
-.hero h1{font-size:24px}
-.hero p{opacity:.85;margin-top:4px}
+.hero h1{font-size:26px}
+.hero p{opacity:.8;margin-top:6px}
 
 /* SOCIAL */
 
 .social{
 display:flex;
-gap:10px;
 flex-wrap:wrap;
+gap:10px;
 padding:16px;
 }
 
 .social a{
-text-decoration:none;
-color:#fff;
-padding:8px 14px;
+padding:8px 16px;
 border-radius:14px;
 background:rgba(255,255,255,.08);
+text-decoration:none;
+color:#fff;
 transition:.25s;
 }
 
@@ -91,62 +93,43 @@ background:rgba(255,255,255,.18);
 /* BEATS */
 
 .beats{
-padding:10px 14px 20px;
+padding:10px 16px 24px;
 display:flex;
 flex-direction:column;
 gap:14px;
 }
 
 .beat{
-position:relative;
-padding:14px;
+padding:16px;
 border-radius:18px;
 background:rgba(255,255,255,.06);
 backdrop-filter:blur(25px);
 transition:.35s;
+position:relative;
 overflow:hidden;
 }
 
-/* GLASS SHINE BACK */
-
-.beat::before{
+.beat:before{
 content:"";
 position:absolute;
-inset:0;
-background:linear-gradient(
-120deg,
-transparent 30%,
-rgba(255,255,255,.25),
-transparent 70%
-);
+inset:-2px;
+background:linear-gradient(120deg,transparent,rgba(255,255,255,.25),transparent);
 opacity:0;
-transition:.35s;
-pointer-events:none;
+transition:.4s;
 }
 
-.beat:hover::before{
-opacity:.25;
-}
+.beat:hover:before{opacity:1}
 
-.beats:hover .beat{
-opacity:.35;
+.beats:hover .beat:not(:hover){
+opacity:.4;
 filter:blur(2px);
 }
 
 .beat:hover{
-opacity:1!important;
-filter:none!important;
 transform:scale(1.02);
 }
 
 /* TITLE */
-
-.title-row{
-display:flex;
-flex-wrap:wrap;
-gap:6px;
-align-items:center;
-}
 
 .title{
 font-weight:600;
@@ -154,8 +137,9 @@ font-weight:600;
 
 .meta{
 font-size:13px;
-color:#ff6b6b;
-opacity:.9;
+opacity:.7;
+color:#ff8c8c;
+margin-left:6px;
 white-space:nowrap;
 }
 
@@ -193,14 +177,15 @@ background:#fff;
 border-radius:10px;
 }
 
-/* BOTTOM ROW FIX */
+/* BOTTOM */
 
 .bottom{
-display:grid;
-grid-template-columns:1fr auto;
+display:flex;
 align-items:center;
+justify-content:space-between;
 margin-top:10px;
 gap:10px;
+flex-wrap:wrap;
 }
 
 .price{
@@ -209,18 +194,17 @@ opacity:.85;
 white-space:nowrap;
 }
 
-/* BUTTONS */
-
 .actions{
 display:flex;
 gap:8px;
+margin-left:auto;
 }
 
 .download{
 border:none;
 padding:6px 12px;
 border-radius:12px;
-background:rgba(255,255,255,.15);
+background:rgba(255,255,255,.12);
 color:#fff;
 cursor:pointer;
 }
@@ -229,7 +213,7 @@ cursor:pointer;
 border:none;
 padding:6px 14px;
 border-radius:12px;
-background:rgba(255,70,70,.25);
+background:rgba(255,80,80,.85);
 color:#fff;
 cursor:pointer;
 }
@@ -238,9 +222,9 @@ cursor:pointer;
 
 .footer{
 text-align:center;
-padding:14px;
-opacity:.6;
+padding:16px;
 font-size:12px;
+opacity:.6;
 }
 
 .footer a{
@@ -275,17 +259,9 @@ text-decoration:none;
 
 <script>
 
-const CSV_URL="<iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
 let currentAudio=null;
-let currentButton=null;
-
-const nameEl=document.getElementById("name");
-const descEl=document.getElementById("desc");
-const heroEl=document.getElementById("hero");
-const bgEl=document.getElementById("bg");
-const socialEl=document.getElementById("social");
-const beatsEl=document.getElementById("beats");
 
 fetch(CSV_URL)
 .then(r=>r.text())
@@ -293,50 +269,49 @@ fetch(CSV_URL)
 
 const rows=text.trim().split("\n").map(r=>r.split(","));
 
-/* PROFILE FIX */
+/* PROFILE */
 
-const profile=rows[1];
+const p=rows[1];
 
-nameEl.textContent=profile[0] || "";
-descEl.textContent=profile[1] || "";
+document.getElementById("name").textContent=p[0]||"";
+document.getElementById("desc").textContent=p[1]||"";
 
-heroEl.style.backgroundImage=`url(${profile[2]})`;
-bgEl.style.backgroundImage=`url(${profile[2]})`;
+document.getElementById("hero").style.backgroundImage=`url(${p[2]})`;
+document.getElementById("bg").style.backgroundImage=`url(${p[2]})`;
 
 /* SOCIALS */
 
 [
-["Telegram",profile[3]],
-["Instagram",profile[4]],
-["YouTube",profile[5]],
-["VK",profile[6]]
+["Telegram",p[3]],
+["Instagram",p[4]],
+["YouTube",p[5]],
+["VK",p[6]]
 ].forEach(s=>{
 if(!s[1])return;
 const a=document.createElement("a");
 a.href=s[1];
 a.target="_blank";
 a.textContent=s[0];
-socialEl.appendChild(a);
+document.getElementById("social").appendChild(a);
 });
-
-const buyLink=profile[7];
 
 /* BEATS */
 
-rows.slice(4).reverse().forEach(row=>{
+const buyLink=p[7];
+const container=document.getElementById("beats");
 
-if(!row[0]) return;
+rows.slice(4).forEach(r=>{
+
+if(!r[0])return;
 
 const beat=document.createElement("div");
 beat.className="beat";
 
 beat.innerHTML=`
-<div class="title-row">
-<div class="title">${row[0]}</div>
-<div class="meta">| ${row[2]} BPM | ${row[3]}</div>
+<div class="title">
+${r[0]}
+<span class="meta">| ${r[2]} BPM | ${r[3]}</span>
 </div>
-
-<div style="opacity:.7;font-size:13px">${row[1]}</div>
 
 <div class="player">
 <button class="play">▶</button>
@@ -345,7 +320,7 @@ beat.innerHTML=`
 
 <div class="bottom">
 <div class="price">
-MP3 ${row[4]}₽ | WAV ${row[5]}₽ | EXCL ${row[6]}₽
+MP3 ${r[4]}₽ | WAV ${r[5]}₽ | EXCL ${r[6]}₽
 </div>
 
 <div class="actions">
@@ -355,27 +330,23 @@ MP3 ${row[4]}₽ | WAV ${row[5]}₽ | EXCL ${row[6]}₽
 </div>
 `;
 
-const audio=new Audio(row[7]);
+const audio=new Audio(r[7]);
 
 const playBtn=beat.querySelector(".play");
 const bar=beat.querySelector(".bar");
 const progress=beat.querySelector(".progress");
 
-/* PLAYER FIX */
-
 playBtn.onclick=()=>{
-
 if(currentAudio && currentAudio!==audio){
 currentAudio.pause();
-currentAudio.currentTime=0;
-if(currentButton) currentButton.textContent="▶";
+currentAudio.parentCard.querySelector(".play").textContent="▶";
 }
 
 if(audio.paused){
 audio.play();
 playBtn.textContent="❚❚";
 currentAudio=audio;
-currentButton=playBtn;
+audio.parentCard=beat;
 }else{
 audio.pause();
 playBtn.textContent="▶";
@@ -391,13 +362,10 @@ const rect=progress.getBoundingClientRect();
 audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;
 };
 
-beat.querySelector(".buy").onclick=
-()=>window.open(buyLink,"_blank");
+beat.querySelector(".buy").onclick=()=>window.open(buyLink,"_blank");
+beat.querySelector(".download").onclick=()=>window.open(r[7],"_blank");
 
-beat.querySelector(".download").onclick=
-()=>window.open(row[7],"_blank");
-
-beatsEl.appendChild(beat);
+container.appendChild(beat);
 
 });
 
@@ -407,4 +375,3 @@ beatsEl.appendChild(beat);
 
 </body>
 </html>
-
