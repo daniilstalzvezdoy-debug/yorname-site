@@ -2,22 +2,20 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Beat Page</title>
 
 <style>
 
-*{box-sizing:border-box;margin:0;padding:0}
+*{margin:0;padding:0;box-sizing:border-box}
 
 body{
 font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-background:#000;
-color:white;
-min-height:100vh;
+background:#0b0b0b;
 display:flex;
 justify-content:center;
-align-items:center;
-overflow-x:hidden;
+padding:40px 10px;
+color:#fff;
 }
 
 /* BLUR BACKGROUND */
@@ -27,22 +25,22 @@ position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(80px) brightness(.4);
+filter:blur(100px) brightness(.35);
 transform:scale(1.2);
 z-index:-1;
 }
 
-/* APP CARD */
+/* CARD */
 
 .app{
 width:420px;
-max-width:92vw;
+max-width:95vw;
+background:rgba(20,20,20,.65);
+backdrop-filter:blur(28px);
 border-radius:28px;
 overflow:hidden;
-background:rgba(20,20,20,.65);
-backdrop-filter:blur(30px);
 border:1px solid rgba(255,255,255,.08);
-box-shadow:0 30px 80px rgba(0,0,0,.8);
+box-shadow:0 40px 90px rgba(0,0,0,.9);
 }
 
 /* HERO */
@@ -53,7 +51,7 @@ background-size:cover;
 background-position:center;
 display:flex;
 align-items:flex-end;
-padding:22px;
+padding:20px;
 position:relative;
 }
 
@@ -62,15 +60,12 @@ content:"";
 position:absolute;
 inset:0;
 background:linear-gradient(to top,
-rgba(0,0,0,.85),
-rgba(0,0,0,.35),
+rgba(0,0,0,.9),
+rgba(0,0,0,.3),
 transparent);
 }
 
-.heroContent{
-position:relative;
-z-index:2;
-}
+.heroContent{position:relative;z-index:2;}
 
 .hero h1{font-size:22px;margin-bottom:6px}
 .hero p{opacity:.8;font-size:14px}
@@ -79,68 +74,54 @@ z-index:2;
 
 .socials{
 display:flex;
-gap:10px;
-margin-top:10px;
+gap:8px;
+margin-top:12px;
+flex-wrap:wrap;
 }
 
-.socials a{
-width:42px;
-height:42px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:50%;
+.social{
+padding:8px 14px;
+border-radius:10px;
 background:rgba(255,255,255,.08);
-backdrop-filter:blur(12px);
-border:1px solid rgba(255,255,255,.12);
+border:1px solid rgba(255,255,255,.15);
 text-decoration:none;
-color:white;
+color:#fff;
+font-size:13px;
 transition:.25s;
 }
 
-.socials a:hover{
+.social:hover{
 background:rgba(255,255,255,.2);
-transform:translateY(-2px);
 }
 
 /* BEATS */
 
 .beat{
 margin:14px;
-padding:16px;
-border-radius:18px;
+padding:14px;
+border-radius:16px;
 background:rgba(255,255,255,.05);
-backdrop-filter:blur(20px);
 border:1px solid rgba(255,255,255,.08);
-transition:.25s;
-}
-
-.beat:hover{
-transform:translateY(-3px);
-box-shadow:0 12px 40px rgba(0,0,0,.6);
 }
 
 .title{font-weight:600}
 .type{opacity:.6;font-size:13px;margin-bottom:8px}
 
-audio{
-width:100%;
-margin:6px 0;
-}
+audio{width:100%}
 
-.price{
-font-size:13px;
-opacity:.85;
+.bottom{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:8px;
 }
 
 .buy{
-float:right;
-background:rgba(255,255,255,.12);
 padding:6px 14px;
 border-radius:10px;
+background:rgba(255,255,255,.12);
 text-decoration:none;
-color:white;
-transition:.25s;
+color:#fff;
 }
 
 .buy:hover{
@@ -151,7 +132,7 @@ background:rgba(255,255,255,.25);
 text-align:center;
 opacity:.5;
 font-size:12px;
-padding:16px;
+padding:18px;
 }
 
 </style>
@@ -179,80 +160,70 @@ padding:16px;
 
 <script>
 
-/* ===========================
-   ВСТАВЬ СВОЙ CSV СЮДА
-=========================== */
-
-const CSV_URL =
+const CSV =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-
-fetch(CSV_URL)
+fetch(CSV)
 .then(r=>r.text())
-.then(text=>{
+.then(t=>{
 
-const rows=text.trim().split("\n").map(r=>r.split(","));
+const rows=t.split("\n").map(r=>r.split(","));
 
-/* PROFILE */
+/* PROFILE (строка 2) */
 
-const profile=rows[1];
+const p=rows[1];
 
-const name=profile[0];
-const desc=profile[1];
-const photo=profile[2];
-const tg=profile[3];
-const ig=profile[4];
-const yt=profile[5];
-const vk=profile[6];
-const buyLink=profile[7];
+const name=p[0];
+const desc=p[1];
+const photo=p[2];
+const tg=p[3];
+const ig=p[4];
+const yt=p[5];
+const vk=p[6];
+const buy=p[7];
 
-document.getElementById("name").textContent=name;
-document.getElementById("desc").textContent=desc;
+nameEl.textContent=name;
+descEl.textContent=desc;
 
-document.getElementById("hero").style.backgroundImage=`url(${photo})`;
-document.getElementById("bg").style.backgroundImage=`url(${photo})`;
+hero.style.backgroundImage=`url(${photo})`;
+bg.style.backgroundImage=`url(${photo})`;
 
-/* SOCIALS */
-
-const socials=document.getElementById("socials");
+/* SOCIAL BUTTONS */
 
 [
-["📨",tg],
-["📸",ig],
-["▶️",yt],
-["🖤",vk]
-].forEach(([icon,link])=>{
+["Telegram",tg],
+["Instagram",ig],
+["YouTube",yt],
+["VK",vk]
+].forEach(([label,link])=>{
 if(link){
 const a=document.createElement("a");
+a.className="social";
 a.href=link;
 a.target="_blank";
-a.textContent=icon;
+a.textContent=label;
 socials.appendChild(a);
 }
 });
 
-/* BEATS */
+/* BEATS (с 6 строки) */
 
-const beats=document.getElementById("beats");
+rows.slice(5).forEach(r=>{
 
-rows.slice(4).forEach(row=>{
-
-if(!row[0]) return;
-
-const [title,type,mp3,wav,excl,url]=row;
+if(!r[0]) return;
 
 const div=document.createElement("div");
 div.className="beat";
 
 div.innerHTML=`
-<div class="title">${title}</div>
-<div class="type">${type}</div>
+<div class="title">${r[0]}</div>
+<div class="type">${r[1]}</div>
 
-<audio controls src="${url}"></audio>
+<audio controls src="${r[5]}"></audio>
 
-<div class="price">
-MP3 ${mp3}₽ | WAV ${wav}₽ | EXCL ${excl}₽
-<a class="buy" target="_blank" href="${buyLink}">Купить</a>
+<div class="bottom">
+<div>MP3 ${r[2]} | WAV ${r[3]} | EXCL ${r[4]}</div>
+<a class="buy" href="${buy}" target="_blank">Купить</a>
 </div>
 `;
 
@@ -262,7 +233,7 @@ beats.appendChild(div);
 
 });
 
-/* ONLY ONE AUDIO */
+/* ONE PLAYER */
 
 document.addEventListener("play",e=>{
 document.querySelectorAll("audio").forEach(a=>{
