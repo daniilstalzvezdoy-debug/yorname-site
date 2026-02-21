@@ -3,7 +3,6 @@
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
 /* ===== DOM ===== */
-
 const artistEl=document.getElementById("artist");
 const descriptionEl=document.getElementById("description");
 const heroEl=document.getElementById("hero");
@@ -11,7 +10,6 @@ const socialsEl=document.getElementById("socials");
 const beatsEl=document.getElementById("beats");
 
 /* ===== CSV PARSER ===== */
-
 function parseCSV(text){
 const rows=[];
 let row=[],value="",inside=false;
@@ -30,13 +28,10 @@ continue;
 }
 value+=c;
 }
-
-return rows.filter(r=>r.some(v=>v!==""));
+return rows.filter(r=>r.length);
 }
 
 let currentAudio=null;
-
-/* ===== LOAD ===== */
 
 fetch(CSV_URL)
 .then(r=>r.text())
@@ -44,21 +39,23 @@ fetch(CSV_URL)
 
 const rows=parseCSV(text);
 
-/* ищем профиль */
-const profile = rows.find(r => r[0] && r[0] !== "Название");
+/* ===== СТРОГАЯ СХЕМА =====
+0 — заголовки профиля
+1 — данные профиля
+2 — пусто
+3 — заголовки битов
+4+ — биты
+*/
 
-/* ищем начало битов */
-const beatStartIndex =
-rows.findIndex(r => r[0]==="Название");
-
-const beatsData = rows.slice(beatStartIndex+1);
+const profile = rows[1];
+const beatsData = rows.slice(4);
 
 /* PROFILE */
 
-artistEl.textContent=profile?.[0]||"";
-descriptionEl.textContent=profile?.[1]||"";
+artistEl.textContent=profile[0]||"";
+descriptionEl.textContent=profile[1]||"";
 
-if(profile?.[2]){
+if(profile[2]){
 heroEl.style.backgroundImage=`url(${profile[2]})`;
 document.body.style.backgroundImage=`url(${profile[2]})`;
 }
@@ -66,10 +63,10 @@ document.body.style.backgroundImage=`url(${profile[2]})`;
 /* SOCIALS */
 
 const socialsData=[
-["Telegram",profile?.[3]],
-["Instagram",profile?.[4]],
-["YouTube",profile?.[5]],
-["VK",profile?.[6]]
+["Telegram",profile[3]],
+["Instagram",profile[4]],
+["YouTube",profile[5]],
+["VK",profile[6]]
 ];
 
 socialsEl.innerHTML="";
@@ -83,7 +80,7 @@ a.textContent=s[0];
 socialsEl.appendChild(a);
 });
 
-const buyLink = profile?.[7] || "#";
+const buyLink = profile[7] || "#";
 
 /* BEATS */
 
@@ -119,7 +116,6 @@ const bar=beat.querySelector(".bar");
 const progress=beat.querySelector(".progress");
 
 play.onclick=()=>{
-
 if(currentAudio && currentAudio!==audio){
 currentAudio.pause();
 document.querySelectorAll(".play").forEach(b=>b.textContent="▶");
@@ -149,8 +145,6 @@ audio.currentTime=((e.clientX-r.left)/r.width)*audio.duration;
 });
 
 })
-.catch(err=>{
-console.error("CSV LOAD ERROR:",err);
-});
+.catch(e=>console.error("LOAD ERROR:",e));
 
 </script>
