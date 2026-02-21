@@ -2,40 +2,50 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Beat Page</title>
 
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
 <style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+
 body{
-margin:0;
-font-family:Arial;
-background:#111;
+font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+background:#000;
+color:white;
+min-height:100vh;
 display:flex;
 justify-content:center;
-padding:40px 10px;
-color:white;
+align-items:center;
+overflow-x:hidden;
 }
+
+/* BLUR BACKGROUND */
 
 .bg{
 position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(70px) brightness(.35);
+filter:blur(80px) brightness(.4);
+transform:scale(1.2);
 z-index:-1;
 }
 
+/* APP CARD */
+
 .app{
 width:420px;
-max-width:100%;
-background:#0b0b0bcc;
-backdrop-filter:blur(25px);
+max-width:92vw;
 border-radius:28px;
 overflow:hidden;
-box-shadow:0 30px 80px rgba(0,0,0,.6);
+background:rgba(20,20,20,.65);
+backdrop-filter:blur(30px);
+border:1px solid rgba(255,255,255,.08);
+box-shadow:0 30px 80px rgba(0,0,0,.8);
 }
+
+/* HERO */
 
 .hero{
 height:260px;
@@ -43,34 +53,107 @@ background-size:cover;
 background-position:center;
 display:flex;
 align-items:flex-end;
-padding:20px;
+padding:22px;
+position:relative;
 }
 
-.hero h1{margin:0}
+.hero::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(to top,
+rgba(0,0,0,.85),
+rgba(0,0,0,.35),
+transparent);
+}
+
+.heroContent{
+position:relative;
+z-index:2;
+}
+
+.hero h1{font-size:22px;margin-bottom:6px}
+.hero p{opacity:.8;font-size:14px}
+
+/* SOCIALS */
 
 .socials{
 display:flex;
 gap:10px;
-padding:14px;
+margin-top:10px;
 }
 
 .socials a{
-background:#ffffff15;
-padding:8px 12px;
-border-radius:12px;
+width:42px;
+height:42px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(12px);
+border:1px solid rgba(255,255,255,.12);
 text-decoration:none;
 color:white;
-font-size:13px;
+transition:.25s;
 }
 
+.socials a:hover{
+background:rgba(255,255,255,.2);
+transform:translateY(-2px);
+}
+
+/* BEATS */
+
 .beat{
+margin:14px;
 padding:16px;
-border-top:1px solid rgba(255,255,255,.05);
+border-radius:18px;
+background:rgba(255,255,255,.05);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.08);
+transition:.25s;
+}
+
+.beat:hover{
+transform:translateY(-3px);
+box-shadow:0 12px 40px rgba(0,0,0,.6);
+}
+
+.title{font-weight:600}
+.type{opacity:.6;font-size:13px;margin-bottom:8px}
+
+audio{
+width:100%;
+margin:6px 0;
+}
+
+.price{
+font-size:13px;
+opacity:.85;
 }
 
 .buy{
 float:right;
+background:rgba(255,255,255,.12);
+padding:6px 14px;
+border-radius:10px;
+text-decoration:none;
+color:white;
+transition:.25s;
 }
+
+.buy:hover{
+background:rgba(255,255,255,.25);
+}
+
+.footer{
+text-align:center;
+opacity:.5;
+font-size:12px;
+padding:16px;
+}
+
 </style>
 </head>
 
@@ -81,97 +164,113 @@ float:right;
 <div class="app">
 
 <div class="hero" id="hero">
-<div>
-<h1 id="artistName">Loading...</h1>
-<div id="artistDesc" style="opacity:.7"></div>
-</div>
-</div>
-
+<div class="heroContent">
+<h1 id="name">Loading...</h1>
+<p id="desc"></p>
 <div class="socials" id="socials"></div>
+</div>
+</div>
 
 <div id="beats"></div>
 
-<div style="text-align:center;padding:14px;opacity:.4;font-size:12px">
-Made by BULAVIN
-</div>
+<div class="footer">Made by BULAVIN</div>
 
 </div>
 
 <script>
 
-const CSV =
+/* ===========================
+   ВСТАВЬ СВОЙ CSV СЮДА
+=========================== */
+
+const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-Papa.parse(CSV,{
-download:true,
-complete:(res)=>{
 
-const d=res.data;
+fetch(CSV_URL)
+.then(r=>r.text())
+.then(text=>{
 
-/* ===== PROFILE ===== */
+const rows=text.trim().split("\n").map(r=>r.split(","));
 
-const name=d[1][0];
-const desc=d[1][1];
-const photo=d[1][2];
-const tg=d[1][3];
-const insta=d[1][4];
-const yt=d[1][5];
-const vk=d[1][6];
-const buyLink=d[1][7];
+/* PROFILE */
 
-artistName.textContent=name;
-artistDesc.textContent=desc;
+const profile=rows[1];
 
-if(photo){
-hero.style.backgroundImage=`url(${photo})`;
-bg.style.backgroundImage=`url(${photo})`;
-}
+const name=profile[0];
+const desc=profile[1];
+const photo=profile[2];
+const tg=profile[3];
+const ig=profile[4];
+const yt=profile[5];
+const vk=profile[6];
+const buyLink=profile[7];
 
-/* socials */
+document.getElementById("name").textContent=name;
+document.getElementById("desc").textContent=desc;
+
+document.getElementById("hero").style.backgroundImage=`url(${photo})`;
+document.getElementById("bg").style.backgroundImage=`url(${photo})`;
+
+/* SOCIALS */
 
 const socials=document.getElementById("socials");
 
 [
-["TG",tg],
-["IG",insta],
-["YT",yt],
-["VK",vk]
-].forEach(([label,link])=>{
+["📨",tg],
+["📸",ig],
+["▶️",yt],
+["🖤",vk]
+].forEach(([icon,link])=>{
 if(link){
-socials.innerHTML+=`<a href="${link}" target="_blank">${label}</a>`;
+const a=document.createElement("a");
+a.href=link;
+a.target="_blank";
+a.textContent=icon;
+socials.appendChild(a);
 }
 });
 
-/* ===== BEATS ===== */
+/* BEATS */
 
 const beats=document.getElementById("beats");
 
-for(let i=4;i<d.length;i++){
+rows.slice(4).forEach(row=>{
 
-const r=d[i];
-if(!r[0]) continue;
+if(!row[0]) return;
 
-beats.innerHTML+=`
-<div class="beat">
+const [title,type,mp3,wav,excl,url]=row;
 
-<b>${r[0]}</b><br>
-<span style="opacity:.6">${r[1]}</span><br><br>
+const div=document.createElement("div");
+div.className="beat";
 
-<audio controls src="${r[5]}" style="width:100%"></audio>
+div.innerHTML=`
+<div class="title">${title}</div>
+<div class="type">${type}</div>
 
-<div style="margin-top:8px">
-MP3 ${r[2]}₽ | WAV ${r[3]}₽ | EXCL ${r[4]}₽
-<button class="buy" onclick="window.open('${buyLink}','_blank')">
-Купить
-</button>
+<audio controls src="${url}"></audio>
+
+<div class="price">
+MP3 ${mp3}₽ | WAV ${wav}₽ | EXCL ${excl}₽
+<a class="buy" target="_blank" href="${buyLink}">Купить</a>
 </div>
+`;
 
-</div>`;
-}
+beats.appendChild(div);
 
-}
 });
 
+});
+
+/* ONLY ONE AUDIO */
+
+document.addEventListener("play",e=>{
+document.querySelectorAll("audio").forEach(a=>{
+if(a!==e.target)a.pause();
+});
+},true);
+
 </script>
+
 </body>
 </html>
