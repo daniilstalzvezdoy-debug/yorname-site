@@ -3,29 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
 <title>Beat Page</title>
 
 <style>
+
 body{
 margin:0;
-background:#f3f3f3;
 font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+background:#000;
 display:flex;
 justify-content:center;
 padding:40px 10px;
+overflow-x:hidden;
 }
 
+/* BLUR BACKGROUND */
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background-size:cover;
+background-position:center;
+filter:blur(80px) brightness(.4);
+z-index:-1;
+transform:scale(1.2);
+}
+
+/* APP */
 .app{
 width:100%;
 max-width:420px;
-background:#0b0b0b;
+background:rgba(15,15,15,.75);
+backdrop-filter:blur(20px);
 border-radius:30px;
 overflow:hidden;
 color:white;
-box-shadow:0 30px 80px rgba(0,0,0,.25);
+box-shadow:0 40px 120px rgba(0,0,0,.5);
 }
 
 /* HERO */
+
 .hero{
 height:260px;
 background-size:cover;
@@ -49,9 +67,10 @@ z-index:2;
 }
 
 .hero h1{margin:0;font-size:22px;}
-.desc{opacity:.7;font-size:13px;margin-top:6px}
+.desc{opacity:.75;font-size:13px;margin-top:6px}
 
 /* SOCIALS */
+
 .socials{
 display:flex;
 gap:10px;
@@ -63,21 +82,27 @@ flex:1;
 text-align:center;
 padding:10px;
 border-radius:14px;
-background:rgba(255,255,255,.06);
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(10px);
 text-decoration:none;
 color:white;
-font-size:14px;
 }
 
 /* BEATS */
-.beats{padding:10px 15px 25px;}
+
+.beats{padding:10px 15px 20px;}
 
 .beat{
-background:rgba(255,255,255,.04);
+background:rgba(255,255,255,.06);
+backdrop-filter:blur(12px);
 border-radius:18px;
 padding:15px;
 margin-bottom:14px;
 transition:.25s;
+}
+
+.beat:hover{
+background:rgba(255,255,255,.12);
 }
 
 .title{font-size:15px;font-weight:600;}
@@ -90,14 +115,12 @@ gap:10px;
 }
 
 .play{
-width:36px;
-height:36px;
+width:36px;height:36px;
 border-radius:50%;
 border:none;
-background:#1f1f1f;
+background:rgba(255,255,255,.1);
 color:white;
 cursor:pointer;
-font-size:14px;
 }
 
 .progress{
@@ -119,7 +142,6 @@ border-radius:10px;
 .price{
 margin-top:10px;
 font-size:12px;
-opacity:.85;
 display:flex;
 justify-content:space-between;
 align-items:center;
@@ -128,11 +150,25 @@ align-items:center;
 .buy{
 padding:6px 14px;
 border-radius:12px;
-background:rgba(255,255,255,.08);
+background:rgba(255,255,255,.12);
+text-decoration:none;
+color:white;
+}
+
+/* FOOTER */
+
+.footer{
+text-align:center;
+padding:20px;
+font-size:11px;
+opacity:.5;
+}
+
+.footer a{
 color:white;
 text-decoration:none;
-font-size:12px;
 }
+
 </style>
 </head>
 
@@ -151,83 +187,76 @@ font-size:12px;
 
 <div class="beats" id="beats"></div>
 
+<div class="footer">
+Made by <a href="https://t.me/yourlink" target="_blank">BULAVIN</a>
+</div>
+
 </div>
 
 <script>
 
-/* ================= CONFIG ================= */
+const CSV_URL="PASTE_YOUR_CSV_LINK";
 
-const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
-
-/* ========================================== */
-
-/* ===== НАДЁЖНЫЙ CSV PARSER ===== */
+/* CSV parser */
 function parseCSV(text){
 const rows=[];
-let row=[],value="",insideQuotes=false;
+let row=[],value="",inside=false;
 
-for(let i=0;i<text.length;i++){
-const char=text[i];
-
-if(char === '"'){insideQuotes=!insideQuotes;continue;}
-
-if(char === "," && !insideQuotes){
-row.push(value);
-value="";
+for(let c of text){
+if(c=='"'){inside=!inside;continue;}
+if(c==","&&!inside){row.push(value);value="";continue;}
+if((c=="\n"||c=="\r")&&!inside){
+if(value||row.length){row.push(value);rows.push(row);row=[];value="";}
 continue;
 }
-
-if((char === "\n" || char === "\r") && !insideQuotes){
-if(value || row.length){
-row.push(value);
-rows.push(row);
-row=[];
-value="";
+value+=c;
 }
-continue;
-}
-
-value+=char;
-}
-
 return rows;
 }
 
 let currentAudio=null;
-
-/* ===== LOAD DATA ===== */
 
 fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
 const rows=parseCSV(text);
-
-const profile=rows[1] || [];
+const p=rows[1]||[];
 
 /* PROFILE */
 
-document.getElementById("artist").textContent=profile[0] || "";
-document.getElementById("description").textContent=profile[1] || "";
+artist.textContent=p[0]||"";
+description.textContent=p[1]||"";
 
-if(profile[2])
-document.getElementById("hero").style.backgroundImage=`url(${profile[2]})`;
+hero.style.backgroundImage=`url(${p[2]})`;
+document.body.style.setProperty("--bg",`url(${p[2]})`);
+document.body.style.backgroundImage=`url(${p[2]})`;
+document.body.style.backgroundSize="cover";
 
-/* SOCIALS */
+document.body.style.setProperty("background-image",`url(${p[2]})`);
+document.body.style.setProperty("--hero",p[2]);
+
+document.body.style.setProperty("--heroimg",`url(${p[2]})`);
+document.body.style.backgroundImage=`url(${p[2]})`;
+document.body.style.backgroundAttachment="fixed";
+
+/* blur bg */
+document.body.style.setProperty("--bgimg",`url(${p[2]})`);
+document.body.style.backgroundImage=`url(${p[2]})`;
+document.body.style.backgroundPosition="center";
+
+/* socials */
 
 const socialsData=[
-["Telegram",profile[3]],
-["Instagram",profile[4]],
-["YouTube",profile[5]],
-["VK",profile[6]]
+["Telegram",p[3]],
+["Instagram",p[4]],
+["YouTube",p[5]],
+["VK",p[6]]
 ];
 
-const socials=document.getElementById("socials");
 socials.innerHTML="";
-
 socialsData.forEach(s=>{
-if(!s[1]) return;
+if(!s[1])return;
 const a=document.createElement("a");
 a.href=s[1];
 a.target="_blank";
@@ -235,14 +264,12 @@ a.textContent=s[0];
 socials.appendChild(a);
 });
 
-/* BEATS */
+const buyLink=p[7]||"#";
 
-const container=document.getElementById("beats");
-container.innerHTML="";
+/* beats */
 
 rows.slice(4).forEach(row=>{
-
-if(!row[0]) return;
+if(!row[0])return;
 
 const beat=document.createElement("div");
 beat.className="beat";
@@ -257,28 +284,23 @@ beat.innerHTML=`
 </div>
 
 <div class="price">
-<span>
-MP3 ${row[2]||0}₽ | WAV ${row[3]||0}₽ | EXCL ${row[4]||0}₽
-</span>
-<a class="buy" href="${profile[3]||'#'}" target="_blank">Купить</a>
+<span>MP3 ${row[2]}₽ | WAV ${row[3]}₽ | EXCL ${row[4]}₽</span>
+<a class="buy" href="${buyLink}" target="_blank">Купить</a>
 </div>
 `;
 
-container.appendChild(beat);
+beats.appendChild(beat);
 
 const audio=new Audio(row[5]);
 const play=beat.querySelector(".play");
-const progress=beat.querySelector(".progress");
 const bar=beat.querySelector(".bar");
+const progress=beat.querySelector(".progress");
 
-/* ONE PLAYER ONLY */
 play.onclick=()=>{
-
-if(currentAudio && currentAudio!==audio){
+if(currentAudio&&currentAudio!==audio){
 currentAudio.pause();
 document.querySelectorAll(".play").forEach(b=>b.textContent="▶");
 }
-
 if(audio.paused){
 audio.play();
 play.textContent="❚❚";
@@ -295,16 +317,13 @@ bar.style.width=(audio.currentTime/audio.duration)*100+"%";
 };
 
 progress.onclick=e=>{
-if(!audio.duration) return;
-const rect=progress.getBoundingClientRect();
-audio.currentTime=
-((e.clientX-rect.left)/rect.width)*audio.duration;
+const r=progress.getBoundingClientRect();
+audio.currentTime=((e.clientX-r.left)/r.width)*audio.duration;
 };
 
 });
 
 });
-
 </script>
 
 </body>
