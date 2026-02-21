@@ -7,7 +7,7 @@
 
 <style>
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 
 body{
 background:#0b0b0b;
@@ -25,10 +25,9 @@ position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(70px) brightness(.6);
+filter:blur(60px) brightness(.6);
 transform:scale(1.2);
-z-index:-2;
-transition:filter .4s ease;
+z-index:-1;
 }
 
 /* APP */
@@ -38,11 +37,9 @@ width:420px;
 max-width:95%;
 border-radius:28px;
 overflow:hidden;
-background:rgba(20,20,20,.55);
 backdrop-filter:blur(30px);
-box-shadow:
-0 20px 80px rgba(0,0,0,.6),
-inset 0 1px rgba(255,255,255,.15);
+background:rgba(20,20,20,.55);
+box-shadow:0 20px 80px rgba(0,0,0,.6);
 }
 
 /* HERO */
@@ -64,10 +61,13 @@ inset:0;
 background:linear-gradient(to top,rgba(0,0,0,.85),transparent 60%);
 }
 
-.hero-text{position:relative;z-index:2;}
+.hero-text{
+position:relative;
+z-index:2;
+}
 
-.hero h1{font-size:24px;font-weight:700}
-.hero p{opacity:.85;margin-top:6px}
+.hero h1{font-size:24px}
+.hero p{opacity:.8}
 
 /* SOCIAL */
 
@@ -84,6 +84,7 @@ color:#fff;
 padding:8px 14px;
 border-radius:14px;
 background:rgba(255,255,255,.08);
+transition:.25s;
 }
 
 /* BEATS */
@@ -99,48 +100,36 @@ gap:14px;
 padding:14px;
 border-radius:18px;
 background:rgba(255,255,255,.06);
+backdrop-filter:blur(25px);
 transition:.35s;
-position:relative;
-overflow:hidden;
 }
 
-/* GLASS LIGHT */
+/* hover blur */
 
-.beat::before{
-content:"";
-position:absolute;
-inset:-40%;
-background:linear-gradient(120deg,transparent 40%,rgba(255,255,255,.15),transparent 60%);
-opacity:0;
-transition:.6s;
-transform:translateX(-60%);
-pointer-events:none;
-}
-
-.beat:hover::before{
-opacity:1;
-transform:translateX(60%);
-}
-
-/* HOVER SYSTEM */
-
-.beats .beat:hover{
-transform:scale(1.02);
-z-index:2;
-}
-
-.beats .beat:hover ~ .beat,
-.beats .beat:has(~ .beat:hover){
+.beats:hover .beat{
 opacity:.35;
 filter:blur(2px);
 }
 
-/* ACTIVE */
+.beat:hover{
+opacity:1!important;
+filter:none!important;
+transform:scale(1.02);
+}
 
-.beat.active{
-box-shadow:
-0 0 25px rgba(255,255,255,.08),
-0 0 60px rgba(255,255,255,.05);
+/* TITLE */
+
+.title{
+font-weight:600;
+font-size:16px;
+}
+
+.meta{
+font-size:13px;
+margin-left:6px;
+color:#ff6b6b;
+opacity:.85;
+font-weight:400;
 }
 
 /* PLAYER */
@@ -168,6 +157,7 @@ height:4px;
 background:#444;
 border-radius:10px;
 cursor:pointer;
+position:relative;
 }
 
 .bar{
@@ -177,7 +167,7 @@ background:#fff;
 border-radius:10px;
 }
 
-/* PRICE */
+/* BOTTOM */
 
 .bottom{
 display:flex;
@@ -187,8 +177,8 @@ margin-top:10px;
 }
 
 .price{
-font-size:11px;
-opacity:.85;
+font-size:12px;
+opacity:.8;
 }
 
 .actions{
@@ -198,9 +188,9 @@ gap:8px;
 
 .download{
 border:none;
-padding:6px 14px;
+padding:6px 12px;
 border-radius:12px;
-background:rgba(255,255,255,.12);
+background:rgba(255,255,255,.15);
 color:#fff;
 cursor:pointer;
 }
@@ -209,22 +199,24 @@ cursor:pointer;
 border:none;
 padding:6px 14px;
 border-radius:12px;
-background:rgba(255,60,60,.25);
+background:rgba(255,80,80,.25);
 color:#fff;
 cursor:pointer;
-box-shadow:0 0 12px rgba(255,60,60,.25);
 }
 
 /* FOOTER */
 
 .footer{
 text-align:center;
-padding:16px;
-font-size:12px;
+padding:14px;
 opacity:.6;
+font-size:12px;
 }
 
-.footer a{color:#fff;text-decoration:none;}
+.footer a{
+color:#fff;
+text-decoration:none;
+}
 
 </style>
 </head>
@@ -246,9 +238,7 @@ opacity:.6;
 <div class="beats" id="beats"></div>
 
 <div class="footer">
-<a href="https://t.me/imbulavin" target="_blank">
-© <span id="year"></span> BULAVIN. All rights reserved.
-</a>
+© <a href="https://t.me/imbulavin" target="_blank">BULAVIN</a>
 </div>
 
 </div>
@@ -257,84 +247,73 @@ opacity:.6;
 
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-/* CSV PARSER */
-
-function parseCSV(text){
-const rows=[];
-let row=[],cell="",quotes=false;
-
-for(let c of text){
-if(c=='"'){quotes=!quotes;continue;}
-if(c==','&&!quotes){row.push(cell);cell="";continue;}
-if((c=='\n'||c=='\r')&&!quotes){
-if(cell||row.length){row.push(cell);rows.push(row);row=[];cell="";}
-continue;
-}
-cell+=c;
-}
-if(cell)row.push(cell);
-if(row.length)rows.push(row);
-return rows;
-}
-
-/* DOM */
-
-const nameEl=document.getElementById("name");
-const descEl=document.getElementById("desc");
-const heroEl=document.getElementById("hero");
-const bgEl=document.getElementById("bg");
-const socialEl=document.getElementById("social");
-const beatsEl=document.getElementById("beats");
-document.getElementById("year").textContent=new Date().getFullYear();
-
-/* AUDIO ENGINE */
-
 let currentAudio=null;
-let currentBtn=null;
-let currentCard=null;
 
 fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
-const rows=parseCSV(text);
-const p=rows[1];
+const rows=text.trim().split("\n").map(r=>r.split(","));
 
 /* PROFILE */
 
-nameEl.textContent=p[0];
-descEl.textContent=p[1];
-heroEl.style.backgroundImage=`url(${p[2]})`;
-bgEl.style.backgroundImage=`url(${p[2]})`;
+const p=rows[1];
 
-/* SOCIALS */
+document.getElementById("name").textContent=p[0];
+document.getElementById("desc").textContent=p[1];
 
-[
+document.getElementById("hero").style.backgroundImage=`url(${p[2]})`;
+document.getElementById("bg").style.backgroundImage=`url(${p[2]})`;
+
+/* SOCIAL */
+
+const socials=[
 ["Telegram",p[3]],
 ["Instagram",p[4]],
 ["YouTube",p[5]],
 ["VK",p[6]]
-].forEach(([label,link])=>{
-if(!link)return;
+];
+
+const socialWrap=document.getElementById("social");
+
+socials.forEach(s=>{
+if(!s[1])return;
 const a=document.createElement("a");
-a.href=link;
+a.href=s[1];
 a.target="_blank";
-a.textContent=label;
-socialEl.appendChild(a);
+a.textContent=s[0];
+socialWrap.appendChild(a);
 });
 
 /* BEATS */
 
-rows.slice(4).reverse().forEach(r=>{
+const buyLink=p[7];
+const beatsContainer=document.getElementById("beats");
 
-if(!r[0])return;
+rows.slice(4).reverse().forEach(row=>{
+
+if(!row[0])return;
+
+const title=row[0];
+const type=row[1];
+const bpm=row[2];
+const key=row[3];
+const mp3=row[4];
+const wav=row[5];
+const excl=row[6];
+const url=row[7];
 
 const beat=document.createElement("div");
 beat.className="beat";
 
 beat.innerHTML=`
-<b>${r[0]}</b>
-<div style="opacity:.7;font-size:13px">${r[1]}</div>
+
+<div class="title">
+${title}
+<span class="meta">| ${bpm} BPM | ${key}</span>
+</div>
+
+<div style="opacity:.7;font-size:13px">${type}</div>
 
 <div class="player">
 <button class="play">▶</button>
@@ -343,8 +322,9 @@ beat.innerHTML=`
 
 <div class="bottom">
 <div class="price">
-MP3 ${r[2]}₽ | WAV ${r[3]}₽ | EXCL ${r[4]}₽
+MP3 ${mp3}₽ | WAV ${wav}₽ | EXCL ${excl}₽
 </div>
+
 <div class="actions">
 <button class="download">Скачать</button>
 <button class="buy">Купить</button>
@@ -352,47 +332,29 @@ MP3 ${r[2]}₽ | WAV ${r[3]}₽ | EXCL ${r[4]}₽
 </div>
 `;
 
-const audio=new Audio(r[5]);
+const audio=new Audio(url);
+
 const playBtn=beat.querySelector(".play");
 const bar=beat.querySelector(".bar");
 const progress=beat.querySelector(".progress");
 
-/* PLAY SYSTEM */
-
 playBtn.onclick=()=>{
-
 if(currentAudio && currentAudio!==audio){
 currentAudio.pause();
-currentBtn.textContent="▶";
-currentCard.classList.remove("active");
+currentAudio.parentElement.querySelector(".play").textContent="▶";
 }
 
 if(audio.paused){
-
 audio.play();
 playBtn.textContent="❚❚";
-beat.classList.add("active");
-
-bgEl.style.filter="blur(80px) brightness(.75)";
-
 currentAudio=audio;
-currentBtn=playBtn;
-currentCard=beat;
-
 }else{
-
 audio.pause();
 playBtn.textContent="▶";
-beat.classList.remove("active");
-
-bgEl.style.filter="blur(70px) brightness(.6)";
-
-currentAudio=null;
 }
 };
 
 audio.ontimeupdate=()=>{
-if(audio.duration)
 bar.style.width=(audio.currentTime/audio.duration*100)+"%";
 };
 
@@ -401,16 +363,15 @@ const rect=progress.getBoundingClientRect();
 audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;
 };
 
-beat.querySelector(".buy").onclick=()=>window.open(p[7],"_blank");
-
-beat.querySelector(".download").onclick=()=>{
-const a=document.createElement("a");
-a.href=r[5];
-a.download="";
-a.click();
+beat.querySelector(".buy").onclick=()=>{
+window.open(buyLink,"_blank");
 };
 
-beatsEl.appendChild(beat);
+beat.querySelector(".download").onclick=()=>{
+window.open(url,"_blank");
+};
+
+beatsContainer.appendChild(beat);
 
 });
 
