@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Beat Store</title>
 
 <style>
@@ -17,8 +16,8 @@ color:white;
 }
 
 body{
+background:#0b0b0b;
 min-height:100vh;
-background:#0a0a0a;
 overflow-x:hidden;
 }
 
@@ -28,7 +27,7 @@ position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(40px) brightness(0.4);
+filter:blur(45px) brightness(.35);
 z-index:-1;
 }
 
@@ -37,10 +36,10 @@ z-index:-1;
 max-width:900px;
 margin:40px auto;
 padding:24px;
-background:rgba(255,255,255,0.08);
+background:rgba(255,255,255,.08);
 backdrop-filter:blur(25px);
 border-radius:24px;
-box-shadow:0 20px 60px rgba(0,0,0,.5);
+box-shadow:0 20px 60px rgba(0,0,0,.6);
 }
 
 /* HERO */
@@ -73,23 +72,23 @@ margin-bottom:30px;
 text-decoration:none;
 padding:10px 16px;
 border-radius:10px;
-background:rgba(255,255,255,0.1);
+background:rgba(255,255,255,.12);
 transition:.2s;
 }
 
 .socials a:hover{
-background:rgba(255,255,255,0.25);
+background:rgba(255,255,255,.25);
 }
 
 /* BEATS */
 .beat-card{
+background:rgba(255,255,255,.06);
+padding:18px;
+border-radius:16px;
+margin-bottom:14px;
 display:flex;
 flex-direction:column;
 gap:10px;
-padding:18px;
-margin-bottom:14px;
-border-radius:16px;
-background:rgba(255,255,255,0.06);
 }
 
 .beat-title{
@@ -115,16 +114,15 @@ gap:10px;
 }
 
 .price-list span{
-margin-right:15px;
-opacity:.9;
+margin-right:14px;
 }
 
 .buy{
-text-decoration:none;
-padding:10px 18px;
-border-radius:10px;
 background:white;
 color:black;
+padding:10px 18px;
+border-radius:10px;
+text-decoration:none;
 font-weight:600;
 transition:.2s;
 }
@@ -135,7 +133,7 @@ transform:scale(1.05);
 
 @media(max-width:700px){
 .container{
-margin:10px;
+margin:12px;
 }
 }
 
@@ -152,7 +150,6 @@ margin:10px;
 <img id="profilePhoto">
 <div class="nickname" id="nickname"></div>
 <div class="description" id="description"></div>
-
 <div class="socials" id="socials"></div>
 </div>
 
@@ -162,13 +159,47 @@ margin:10px;
 
 <script>
 
-/* ======== ТВОЯ GOOGLE SHEETS ======== */
+/* ===== GOOGLE SHEETS CSV ===== */
 const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-/* ===== CSV PARSER ===== */
+/* ===== SAFE CSV PARSER ===== */
 function parseCSV(text){
-const rows = text.split("\n").map(r=>r.split(","));
+const rows=[];
+let row=[];
+let cell="";
+let insideQuotes=false;
+
+for(let i=0;i<text.length;i++){
+const char=text[i];
+
+if(char === '"'){
+insideQuotes=!insideQuotes;
+continue;
+}
+
+if(char === ',' && !insideQuotes){
+row.push(cell.trim());
+cell="";
+continue;
+}
+
+if((char === '\n' || char === '\r') && !insideQuotes){
+if(cell || row.length){
+row.push(cell.trim());
+rows.push(row);
+row=[];
+cell="";
+}
+continue;
+}
+
+cell+=char;
+}
+
+if(cell) row.push(cell.trim());
+if(row.length) rows.push(row);
+
 return rows;
 }
 
@@ -176,12 +207,12 @@ let currentAudio=null;
 
 fetch(CSV_URL)
 .then(r=>r.text())
-.then(csv=>{
+.then(text=>{
 
-const data=parseCSV(csv);
+const data=parseCSV(text);
 
-/* PROFILE */
-const profile=data[1];
+/* ==== PROFILE ROW ==== */
+const profile=data.find(r=>r[0] && r[0]!=="Псевдоним");
 
 const nickname=profile[0];
 const description=profile[1];
@@ -192,12 +223,12 @@ const youtube=profile[5];
 const vk=profile[6];
 const buyLink=profile[7];
 
-document.getElementById("nickname").textContent=nickname;
-document.getElementById("description").textContent=description;
-document.getElementById("profilePhoto").src=photo;
+document.getElementById("nickname").textContent=nickname||"";
+document.getElementById("description").textContent=description||"";
+document.getElementById("profilePhoto").src=photo||"";
 document.getElementById("bg").style.backgroundImage=`url(${photo})`;
 
-/* SOCIAL LINKS */
+/* ==== SOCIALS ==== */
 const socials=document.getElementById("socials");
 
 [
@@ -210,17 +241,20 @@ if(!link) return;
 const a=document.createElement("a");
 a.href=link;
 a.target="_blank";
+a.rel="noopener";
 a.textContent=name;
 socials.appendChild(a);
 });
 
-/* BEATS */
+/* ==== FIND BEATS ==== */
+const startIndex=data.findIndex(r=>r[0]==="Название");
+
 const beatsContainer=document.getElementById("beats");
 
-for(let i=4;i<data.length;i++){
+for(let i=startIndex+1;i<data.length;i++){
 
 const row=data[i];
-if(!row[0]) continue;
+if(!row || !row[0]) continue;
 
 const [title,type,mp3,wav,excl,preview]=row;
 
@@ -229,18 +263,18 @@ card.className="beat-card";
 
 card.innerHTML=`
 <div class="beat-title">${title}</div>
-<div class="type">${type}</div>
+<div class="type">${type||""}</div>
 
-<audio controls preload="none" src="${preview}"></audio>
+<audio controls preload="none" src="${preview||""}"></audio>
 
 <div class="prices">
 <div class="price-list">
-<span>MP3: $${mp3}</span>
-<span>WAV: $${wav}</span>
-<span>EXCL: $${excl}</span>
+<span>MP3: $${mp3||"-"}</span>
+<span>WAV: $${wav||"-"}</span>
+<span>EXCL: $${excl||"-"}</span>
 </div>
 
-<a class="buy" href="${buyLink}" target="_blank">Купить</a>
+<a class="buy" href="${buyLink||"#"}" target="_blank">Купить</a>
 </div>
 `;
 
