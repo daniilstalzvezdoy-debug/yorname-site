@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Beat Store | Ultimate</title>
+<title>Beat Store | Premium Ultimate</title>
 
 <style>
 /* ОСНОВНЫЕ СТИЛИ */
@@ -94,11 +94,20 @@ white-space:nowrap;
 
 .beats{padding:8px 16px 30px;display:flex;flex-direction:column;gap:14px}
 
-/* ЛОГИКА БЛЮРА: БИТЫ СТАНОВЯТСЯ ПАССИВНЫМИ ВИЗУАЛЬНО, НО КНОПКИ ЖИВУТ */
+/* ЭФФЕКТ РАЗМЫТИЯ ПРИ НАВЕДЕНИИ (ДЛЯ ПК) */
+@media (hover: hover) {
+    .beats:hover .beat:not(:hover) {
+        filter: blur(5px) grayscale(0.5);
+        opacity: 0.4;
+        transform: scale(0.97);
+    }
+}
+
+/* ЛОГИКА БЛЮРА ПРИ ИГРЕ (ДЛЯ МОБИЛОК И ПК) */
 .beats.is-playing .beat:not(.active) {
-    filter: blur(5px) grayscale(0.5);
-    opacity: 0.4;
-    transform: scale(0.97);
+    filter: blur(8px) grayscale(0.7);
+    opacity: 0.3;
+    transform: scale(0.95);
 }
 
 .beat{
@@ -111,11 +120,17 @@ position:relative;
 z-index:2;
 }
 
+.beat:hover {
+    background: rgba(255,255,255,.08);
+    border-color: rgba(255,255,255,.15);
+    transform: scale(1.02);
+}
+
 .beat.active {
-    background: rgba(255,255,255,.1);
-    border-color: rgba(255,255,255,.2);
-    transform: scale(1.03);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    background: rgba(255,255,255,.12);
+    border-color: rgba(255,255,255,.3);
+    transform: scale(1.04) !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
     z-index: 5;
     opacity: 1 !important;
     filter: none !important;
@@ -133,7 +148,7 @@ color:#000;cursor:pointer;
 display:flex;align-items:center;justify-content:center;
 font-size:16px;transition:0.2s;flex-shrink:0;
 }
-.play:hover{transform:scale(1.1);background:#eee}
+.play:hover{transform:scale(1.1)}
 
 .progress{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:10px;cursor:pointer;position:relative}
 .bar{height:100%;width:0%;background:#fff;border-radius:10px;box-shadow: 0 0 10px #fff}
@@ -148,12 +163,10 @@ font-size:16px;transition:0.2s;flex-shrink:0;
 .download { background: rgba(255,255,255,.07); color: #fff; border: 1px solid rgba(255,255,255,.1); }
 .buy { background: #ff3b3b; color: #fff; box-shadow: 0 4px 15px rgba(255,59,59,0.3); }
 
-/* ОЖИВЛЯЕМ КНОПКИ ДАЖЕ ПОД БЛЮРОМ */
 .download:hover, .buy:hover {
-    transform: translateY(-3px) scale(1.05);
-    filter: brightness(1.2);
+    transform: translateY(-2px);
+    filter: brightness(1.1);
 }
-.download:active, .buy:active { transform: scale(0.95); }
 
 @media (max-width: 420px) {
     .bottom { flex-direction: column; align-items: flex-start; gap: 15px; }
@@ -173,7 +186,7 @@ font-size:16px;transition:0.2s;flex-shrink:0;
 <div class="app">
     <div class="hero" id="hero">
         <div class="hero-text">
-            <h1 id="name">...</h1>
+            <h1 id="name">Загрузка...</h1>
             <p id="desc"></p>
         </div>
     </div>
@@ -211,11 +224,15 @@ fetch(CSV_URL).then(res => res.text()).then(text => {
     const rows = parseCSV(text);
     if (rows.length < 2) return;
     const p = rows[1]; 
-    document.getElementById('name').textContent = p[0] || "";
+
+    // ✅ ИСПРАВЛЕННЫЙ БЛОК ФОТО
+    document.getElementById('name').textContent = p[0] || "Artist";
     document.getElementById('desc').textContent = p[1] || "";
-    if(p[ photoUrl = p[2]]) {
-        document.getElementById('hero').style.backgroundImage = `url('${p[2]}')`;
-        document.getElementById('bg').style.backgroundImage = `url('${p[2]}')`;
+    
+    const photoUrl = p[2] || "";
+    if(photoUrl.includes("http")) {
+        document.getElementById('hero').style.backgroundImage = `url('${photoUrl}')`;
+        document.getElementById('bg').style.backgroundImage = `url('${photoUrl}')`;
     }
 
     const socialBox = document.getElementById('social');
