@@ -7,14 +7,16 @@
 
 <style>
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 
 body{
-background:#0b0b0c;
-color:#fff;
+background:#0b0b0b;
 min-height:100vh;
 display:flex;
 justify-content:center;
+align-items:center;
+overflow-x:hidden;
+color:#fff;
 }
 
 /* BACKGROUND */
@@ -24,98 +26,105 @@ position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(70px) brightness(.6);
+filter:blur(60px) brightness(.6);
 transform:scale(1.2);
-z-index:-1;
+z-index:-2;
 }
 
-/* CONTAINER */
-
-.container{
-width:100%;
-max-width:720px;
-padding:20px 16px 40px;
+.bg::after{
+content:"";
+position:absolute;
+inset:0;
+background:radial-gradient(circle at center,transparent,rgba(0,0,0,.8));
 }
 
-/* GLASS */
+/* APP */
 
-.glass{
-background:rgba(255,255,255,.06);
-backdrop-filter:blur(26px);
-border:1px solid rgba(255,255,255,.08);
-border-radius:24px;
+.app{
+width:420px;
+max-width:95%;
+border-radius:28px;
+overflow:hidden;
+backdrop-filter:blur(30px);
+background:rgba(20,20,20,.55);
 box-shadow:
-0 20px 60px rgba(0,0,0,.6),
-inset 0 1px rgba(255,255,255,.08);
+0 20px 80px rgba(0,0,0,.6),
+inset 0 1px rgba(255,255,255,.15);
 }
 
 /* HERO */
 
 .hero{
-overflow:hidden;
-position:relative;
-margin-bottom:18px;
-}
-
-.hero-img{
-height:320px;
+height:240px;
 background-size:cover;
 background-position:center;
+position:relative;
+display:flex;
+align-items:flex-end;
+padding:20px;
 }
 
-.hero-overlay{
+.hero::after{
+content:"";
 position:absolute;
-bottom:0;
-left:0;
-right:0;
-padding:26px;
-background:linear-gradient(to top,rgba(0,0,0,.85),transparent);
+inset:0;
+background:linear-gradient(to top,rgba(0,0,0,.85),transparent 60%);
 }
 
-.hero h1{font-size:30px}
+.hero-text{
+position:relative;
+z-index:2;
+}
+
+.hero h1{font-size:22px;font-weight:700}
 .hero p{opacity:.8;margin-top:4px}
 
 /* SOCIAL */
 
-.socials{
+.social{
 display:flex;
-flex-wrap:wrap;
 gap:10px;
-margin-bottom:18px;
+flex-wrap:wrap;
+padding:16px;
 }
 
-.socials a{
+.social a{
 text-decoration:none;
-color:white;
-padding:10px 18px;
+color:#fff;
+padding:8px 14px;
 border-radius:14px;
 background:rgba(255,255,255,.08);
 transition:.25s;
 }
 
-.socials a:hover{
+.social a:hover{
 background:rgba(255,255,255,.18);
 }
 
 /* BEATS */
 
-.list{
+.beats{
+padding:10px 14px 20px;
 display:flex;
 flex-direction:column;
 gap:14px;
 }
 
 .beat{
-padding:18px;
+padding:14px;
+border-radius:18px;
+background:rgba(255,255,255,.06);
 transition:.35s;
 }
 
-.list:hover .beat:not(:hover){
+.beats:hover .beat{
 opacity:.35;
-filter:blur(3px);
+filter:blur(2px);
 }
 
 .beat:hover{
+opacity:1!important;
+filter:none!important;
 transform:scale(1.02);
 }
 
@@ -124,13 +133,13 @@ transform:scale(1.02);
 .player{
 display:flex;
 align-items:center;
-gap:12px;
-margin:10px 0;
+gap:10px;
+margin-top:10px;
 }
 
 .play{
-width:38px;
-height:38px;
+width:36px;
+height:36px;
 border-radius:50%;
 border:none;
 background:rgba(255,255,255,.15);
@@ -144,6 +153,7 @@ height:4px;
 background:#444;
 border-radius:10px;
 cursor:pointer;
+position:relative;
 }
 
 .bar{
@@ -153,7 +163,7 @@ background:#fff;
 border-radius:10px;
 }
 
-/* BOTTOM */
+/* PRICE */
 
 .bottom{
 display:flex;
@@ -162,30 +172,22 @@ align-items:center;
 margin-top:10px;
 }
 
-.price{font-size:14px;opacity:.85}
+.price{font-size:13px;opacity:.85}
 
 .buy{
-padding:8px 16px;
-border-radius:14px;
 border:none;
-background:white;
-color:black;
+padding:6px 14px;
+border-radius:12px;
+background:rgba(255,255,255,.15);
+color:#fff;
 cursor:pointer;
 }
 
-/* FOOTER */
-
 .footer{
 text-align:center;
+padding:14px;
 opacity:.5;
-margin-top:20px;
 font-size:12px;
-}
-
-.loading{
-text-align:center;
-opacity:.6;
-padding:40px;
 }
 
 </style>
@@ -195,69 +197,109 @@ padding:40px;
 
 <div class="bg" id="bg"></div>
 
-<div class="container">
-<div id="app" class="loading">Loading...</div>
+<div class="app">
+
+<div class="hero" id="hero">
+<div class="hero-text">
+<h1 id="name">Loading...</h1>
+<p id="desc"></p>
+</div>
+</div>
+
+<div class="social" id="social"></div>
+<div class="beats" id="beats"></div>
+
+<div class="footer">Made by BULAVIN</div>
+
 </div>
 
 <script>
 
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-let currentAudio=null;
+/* ===== REAL CSV PARSER ===== */
 
 function parseCSV(text){
-return text.trim().split("\n").map(r=>r.split(","));
+const rows=[];
+let row=[],cell="",q=false;
+
+for(let c of text){
+if(c=='"'){q=!q;continue;}
+if(c==','&&!q){row.push(cell);cell="";continue;}
+if(c=='\n'&&!q){row.push(cell);rows.push(row);row=[];cell="";continue;}
+cell+=c;
 }
+row.push(cell);
+rows.push(row);
+return rows;
+}
+
+/* GOOGLE IMAGE FIX */
+
+function fixImage(url){
+if(!url) return "";
+if(url.includes("drive.google.com")){
+const id=url.split("/d/")[1]?.split("/")[0];
+if(id) return `https://drive.google.com/uc?export=view&id=${id}`;
+}
+return url.trim();
+}
+
+let currentAudio=null;
 
 fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
 const rows=parseCSV(text);
+const p=rows[1];
 
 /* PROFILE */
-const p=rows[1];
 
 const name=p[0];
 const desc=p[1];
-const photo=p[2];
+const photo=fixImage(p[2]);
+
 const tg=p[3];
 const ig=p[4];
 const yt=p[5];
 const vk=p[6];
 const buyLink=p[7];
 
-document.getElementById("bg").style.backgroundImage=`url(${photo})`;
+nameEl.textContent=name;
+descEl.textContent=desc;
 
-let html=`
-<div class="hero glass">
-<div class="hero-img" style="background-image:url('${photo}')"></div>
-<div class="hero-overlay">
-<h1>${name}</h1>
-<p>${desc}</p>
-</div>
-</div>
+hero.style.backgroundImage=`url("${photo}")`;
+bg.style.backgroundImage=`url("${photo}")`;
 
-<div class="socials">
-${tg?`<a href="${tg}" target="_blank">Telegram</a>`:""}
-${ig?`<a href="${ig}" target="_blank">Instagram</a>`:""}
-${yt?`<a href="${yt}" target="_blank">YouTube</a>`:""}
-${vk?`<a href="${vk}" target="_blank">VK</a>`:""}
-</div>
+/* SOCIALS */
 
-<div class="list">
-`;
+[
+["Telegram",tg],
+["Instagram",ig],
+["YouTube",yt],
+["VK",vk]
+].forEach(([label,link])=>{
+if(!link)return;
+const a=document.createElement("a");
+a.href=link.trim();
+a.target="_blank";
+a.textContent=label;
+social.appendChild(a);
+});
 
-for(let i=4;i<rows.length;i++){
+/* BEATS */
 
-let r=rows[i];
-if(!r[0]) continue;
+rows.slice(4).reverse().forEach(r=>{
 
-html+=`
-<div class="beat glass">
+if(!r[0])return;
 
+const beat=document.createElement("div");
+beat.className="beat";
+
+beat.innerHTML=`
 <b>${r[0]}</b>
-<div style="opacity:.6;font-size:14px">${r[1]}</div>
+<div style="opacity:.7;font-size:13px">${r[1]}</div>
 
 <div class="player">
 <button class="play">▶</button>
@@ -270,37 +312,26 @@ MP3 ${r[2]}₽ | WAV ${r[3]}₽ | EXCL ${r[4]}₽
 </div>
 <button class="buy">Купить</button>
 </div>
-
-<audio src="${r[5]}"></audio>
-
-</div>
 `;
-}
 
-html+=`</div><div class="footer">Made by BULAVIN</div>`;
+const audio=new Audio(r[5]);
 
-document.getElementById("app").innerHTML=html;
-
-/* PLAYER */
-
-document.querySelectorAll(".beat").forEach(card=>{
-
-const audio=card.querySelector("audio");
-const play=card.querySelector(".play");
-const bar=card.querySelector(".bar");
-const progress=card.querySelector(".progress");
+const play=beat.querySelector(".play");
+const bar=beat.querySelector(".bar");
+const progress=beat.querySelector(".progress");
 
 play.onclick=()=>{
 
-if(currentAudio && currentAudio!==audio){
+if(currentAudio&&currentAudio!==audio){
 currentAudio.pause();
-currentAudio.parentElement.querySelector(".play").textContent="▶";
+currentAudio._btn.textContent="▶";
 }
 
 if(audio.paused){
 audio.play();
 play.textContent="❚❚";
 currentAudio=audio;
+audio._btn=play;
 }else{
 audio.pause();
 play.textContent="▶";
@@ -308,6 +339,7 @@ play.textContent="▶";
 };
 
 audio.ontimeupdate=()=>{
+if(audio.duration)
 bar.style.width=(audio.currentTime/audio.duration*100)+"%";
 };
 
@@ -316,17 +348,24 @@ const rect=progress.getBoundingClientRect();
 audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;
 };
 
-card.querySelector(".buy").onclick=()=>{
+beat.querySelector(".buy").onclick=()=>{
 window.open(buyLink,"_blank");
 };
 
+beats.appendChild(beat);
+
 });
 
-})
-.catch(()=>{
-document.getElementById("app").innerHTML="Ошибка загрузки CSV";
 });
+
+const nameEl=document.getElementById("name");
+const descEl=document.getElementById("desc");
+const hero=document.getElementById("hero");
+const bg=document.getElementById("bg");
+const social=document.getElementById("social");
+const beats=document.getElementById("beats");
 
 </script>
+
 </body>
 </html>
