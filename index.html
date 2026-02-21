@@ -5,20 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Beat Page</title>
 
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
 <style>
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Inter,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
 
 body{
 background:#0b0b0c;
-color:white;
+color:#fff;
 min-height:100vh;
 display:flex;
 justify-content:center;
-align-items:center;
-overflow-x:hidden;
 }
 
 /* BACKGROUND */
@@ -28,108 +24,99 @@ position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(70px) brightness(.5);
+filter:blur(70px) brightness(.6);
 transform:scale(1.2);
 z-index:-1;
 }
 
-/* APP */
+/* CONTAINER */
 
-.app{
-width:420px;
-max-width:95%;
-border-radius:28px;
-overflow:hidden;
-background:rgba(20,20,20,.55);
-backdrop-filter:blur(30px);
+.container{
+width:100%;
+max-width:720px;
+padding:20px 16px 40px;
+}
+
+/* GLASS */
+
+.glass{
+background:rgba(255,255,255,.06);
+backdrop-filter:blur(26px);
+border:1px solid rgba(255,255,255,.08);
+border-radius:24px;
 box-shadow:
-0 20px 80px rgba(0,0,0,.6),
-inset 0 1px rgba(255,255,255,.1);
+0 20px 60px rgba(0,0,0,.6),
+inset 0 1px rgba(255,255,255,.08);
 }
 
 /* HERO */
 
 .hero{
-height:260px;
+overflow:hidden;
+position:relative;
+margin-bottom:18px;
+}
+
+.hero-img{
+height:320px;
 background-size:cover;
 background-position:center;
-display:flex;
-align-items:flex-end;
-padding:22px;
-position:relative;
 }
 
-.hero::after{
-content:"";
+.hero-overlay{
 position:absolute;
-inset:0;
-background:linear-gradient(to top,rgba(0,0,0,.85),transparent 60%);
+bottom:0;
+left:0;
+right:0;
+padding:26px;
+background:linear-gradient(to top,rgba(0,0,0,.85),transparent);
 }
 
-.hero-text{
-position:relative;
-z-index:2;
-}
-
-.hero h1{
-font-size:24px;
-font-weight:700;
-}
-
-.hero p{
-opacity:.85;
-margin-top:6px;
-}
+.hero h1{font-size:30px}
+.hero p{opacity:.8;margin-top:4px}
 
 /* SOCIAL */
 
-.social{
+.socials{
 display:flex;
-gap:10px;
 flex-wrap:wrap;
-padding:16px;
+gap:10px;
+margin-bottom:18px;
 }
 
-.social a{
+.socials a{
 text-decoration:none;
-color:#fff;
-padding:8px 14px;
+color:white;
+padding:10px 18px;
 border-radius:14px;
 background:rgba(255,255,255,.08);
-backdrop-filter:blur(20px);
 transition:.25s;
 }
 
-.social a:hover{
+.socials a:hover{
 background:rgba(255,255,255,.18);
 }
 
 /* BEATS */
 
-.beats{
-padding:10px 14px 20px;
+.list{
 display:flex;
 flex-direction:column;
 gap:14px;
 }
 
 .beat{
-padding:14px;
-border-radius:18px;
-background:rgba(255,255,255,.06);
-backdrop-filter:blur(25px);
+padding:18px;
 transition:.35s;
 }
 
-.beats:hover .beat{
+.list:hover .beat:not(:hover){
 opacity:.35;
-filter:blur(2px);
+filter:blur(3px);
 }
 
 .beat:hover{
-opacity:1!important;
-filter:none!important;
-transform:scale(1.03);
+transform:scale(1.02);
 }
 
 /* PLAYER */
@@ -137,13 +124,13 @@ transform:scale(1.03);
 .player{
 display:flex;
 align-items:center;
-gap:10px;
-margin-top:10px;
+gap:12px;
+margin:10px 0;
 }
 
 .play{
-width:36px;
-height:36px;
+width:38px;
+height:38px;
 border-radius:50%;
 border:none;
 background:rgba(255,255,255,.15);
@@ -157,7 +144,6 @@ height:4px;
 background:#444;
 border-radius:10px;
 cursor:pointer;
-position:relative;
 }
 
 .bar{
@@ -167,7 +153,7 @@ background:#fff;
 border-radius:10px;
 }
 
-/* PRICE */
+/* BOTTOM */
 
 .bottom{
 display:flex;
@@ -176,25 +162,30 @@ align-items:center;
 margin-top:10px;
 }
 
-.price{
-font-size:13px;
-opacity:.85;
-}
+.price{font-size:14px;opacity:.85}
 
 .buy{
+padding:8px 16px;
+border-radius:14px;
 border:none;
-padding:6px 14px;
-border-radius:12px;
-background:rgba(255,255,255,.15);
-color:#fff;
+background:white;
+color:black;
 cursor:pointer;
 }
 
+/* FOOTER */
+
 .footer{
 text-align:center;
-padding:14px;
 opacity:.5;
+margin-top:20px;
 font-size:12px;
+}
+
+.loading{
+text-align:center;
+opacity:.6;
+padding:40px;
 }
 
 </style>
@@ -204,21 +195,8 @@ font-size:12px;
 
 <div class="bg" id="bg"></div>
 
-<div class="app">
-
-<div class="hero" id="hero">
-<div class="hero-text">
-<h1 id="name">Loading...</h1>
-<p id="desc"></p>
-</div>
-</div>
-
-<div class="social" id="social"></div>
-
-<div class="beats" id="beats"></div>
-
-<div class="footer">Made by BULAVIN</div>
-
+<div class="container">
+<div id="app" class="loading">Loading...</div>
 </div>
 
 <script>
@@ -227,16 +205,17 @@ const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlU
 
 let currentAudio=null;
 
+function parseCSV(text){
+return text.trim().split("\n").map(r=>r.split(","));
+}
+
 fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
-const rows = Papa.parse(text,{
-skipEmptyLines:true
-}).data;
+const rows=parseCSV(text);
 
 /* PROFILE */
-
 const p=rows[1];
 
 const name=p[0];
@@ -248,45 +227,37 @@ const yt=p[5];
 const vk=p[6];
 const buyLink=p[7];
 
-nameEl.textContent=name;
-descEl.textContent=desc;
+document.getElementById("bg").style.backgroundImage=`url(${photo})`;
 
-document.getElementById("name").textContent=name;
-document.getElementById("desc").textContent=desc;
+let html=`
+<div class="hero glass">
+<div class="hero-img" style="background-image:url('${photo}')"></div>
+<div class="hero-overlay">
+<h1>${name}</h1>
+<p>${desc}</p>
+</div>
+</div>
 
-hero.style.backgroundImage=`url(${photo})`;
-bg.style.backgroundImage=`url(${photo})`;
+<div class="socials">
+${tg?`<a href="${tg}" target="_blank">Telegram</a>`:""}
+${ig?`<a href="${ig}" target="_blank">Instagram</a>`:""}
+${yt?`<a href="${yt}" target="_blank">YouTube</a>`:""}
+${vk?`<a href="${vk}" target="_blank">VK</a>`:""}
+</div>
 
-/* SOCIALS */
+<div class="list">
+`;
 
-const socials=[
-["Telegram",tg],
-["Instagram",ig],
-["YouTube",yt],
-["VK",vk]
-];
+for(let i=4;i<rows.length;i++){
 
-socials.forEach(s=>{
-if(!s[1])return;
-const a=document.createElement("a");
-a.href=s[1];
-a.target="_blank";
-a.textContent=s[0];
-social.appendChild(a);
-});
+let r=rows[i];
+if(!r[0]) continue;
 
-/* BEATS */
+html+=`
+<div class="beat glass">
 
-rows.slice(4).reverse().forEach(row=>{
-
-if(!row[0])return;
-
-const beat=document.createElement("div");
-beat.className="beat";
-
-beat.innerHTML=`
-<b>${row[0]}</b>
-<div style="opacity:.7;font-size:13px">${row[1]}</div>
+<b>${r[0]}</b>
+<div style="opacity:.6;font-size:14px">${r[1]}</div>
 
 <div class="player">
 <button class="play">▶</button>
@@ -295,31 +266,44 @@ beat.innerHTML=`
 
 <div class="bottom">
 <div class="price">
-MP3 ${row[2]}₽ | WAV ${row[3]}₽ | EXCL ${row[4]}₽
+MP3 ${r[2]}₽ | WAV ${r[3]}₽ | EXCL ${r[4]}₽
 </div>
 <button class="buy">Купить</button>
 </div>
+
+<audio src="${r[5]}"></audio>
+
+</div>
 `;
+}
 
-const audio=new Audio(row[5]);
+html+=`</div><div class="footer">Made by BULAVIN</div>`;
 
-const playBtn=beat.querySelector(".play");
-const bar=beat.querySelector(".bar");
-const progress=beat.querySelector(".progress");
+document.getElementById("app").innerHTML=html;
 
-playBtn.onclick=()=>{
+/* PLAYER */
+
+document.querySelectorAll(".beat").forEach(card=>{
+
+const audio=card.querySelector("audio");
+const play=card.querySelector(".play");
+const bar=card.querySelector(".bar");
+const progress=card.querySelector(".progress");
+
+play.onclick=()=>{
 
 if(currentAudio && currentAudio!==audio){
 currentAudio.pause();
+currentAudio.parentElement.querySelector(".play").textContent="▶";
 }
 
 if(audio.paused){
 audio.play();
-playBtn.textContent="❚❚";
+play.textContent="❚❚";
 currentAudio=audio;
 }else{
 audio.pause();
-playBtn.textContent="▶";
+play.textContent="▶";
 }
 };
 
@@ -332,17 +316,17 @@ const rect=progress.getBoundingClientRect();
 audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;
 };
 
-beat.querySelector(".buy").onclick=()=>{
+card.querySelector(".buy").onclick=()=>{
 window.open(buyLink,"_blank");
 };
 
-beats.appendChild(beat);
-
 });
 
+})
+.catch(()=>{
+document.getElementById("app").innerHTML="Ошибка загрузки CSV";
 });
 
 </script>
-
 </body>
 </html>
