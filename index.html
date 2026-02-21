@@ -2,227 +2,263 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Beat Page</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- CSV PARSER (главный фикс всей боли) -->
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<title>Beat Store</title>
 
 <style>
-body{
+
+*{
 margin:0;
-font-family:system-ui;
-background:#000;
-display:flex;
-justify-content:center;
-padding:40px 10px;
-color:#fff;
+padding:0;
+box-sizing:border-box;
+font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+color:white;
 }
 
+body{
+min-height:100vh;
+background:#0a0a0a;
+overflow-x:hidden;
+}
+
+/* BACKGROUND */
 .bg{
 position:fixed;
 inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(90px) brightness(.4);
+filter:blur(40px) brightness(0.4);
 z-index:-1;
 }
 
-.app{
-width:420px;
-max-width:100%;
-background:rgba(20,20,20,.65);
-backdrop-filter:blur(30px);
-border-radius:28px;
-overflow:hidden;
-box-shadow:0 40px 120px rgba(0,0,0,.7);
+/* MAIN CARD */
+.container{
+max-width:900px;
+margin:40px auto;
+padding:24px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(25px);
+border-radius:24px;
+box-shadow:0 20px 60px rgba(0,0,0,.5);
 }
 
 /* HERO */
+.hero img{
+width:100%;
+border-radius:18px;
+margin-bottom:15px;
+}
 
-.hero{
-height:260px;
-background-size:cover;
-background-position:center;
+.nickname{
+font-size:34px;
+font-weight:700;
+margin-bottom:8px;
+}
+
+.description{
+opacity:.8;
+margin-bottom:20px;
+}
+
+/* SOCIALS */
+.socials{
 display:flex;
-flex-direction:column;
-justify-content:flex-end;
-padding:20px;
-}
-
-.hero::after{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(to top,#000,transparent);
-}
-
-.hero h1{
-margin:0;
-z-index:2;
-}
-
-.desc{
-opacity:.85;
-font-size:14px;
-margin-top:6px;
-}
-
-/* SOCIAL */
-
-.social{
-display:flex;
-gap:8px;
+gap:10px;
 flex-wrap:wrap;
-padding:14px 18px;
+margin-bottom:30px;
 }
 
-.social a{
+.socials a{
 text-decoration:none;
-color:#fff;
-background:rgba(255,255,255,.08);
-padding:8px 14px;
-border-radius:12px;
-font-size:13px;
+padding:10px 16px;
+border-radius:10px;
+background:rgba(255,255,255,0.1);
+transition:.2s;
+}
+
+.socials a:hover{
+background:rgba(255,255,255,0.25);
 }
 
 /* BEATS */
-
-.beats{padding:14px;}
-
-.beat{
-background:rgba(255,255,255,.06);
-border-radius:16px;
-padding:14px;
-margin-bottom:12px;
-}
-
-audio{width:100%;margin:10px 0;}
-
-.row{
+.beat-card{
 display:flex;
-justify-content:space-between;
-align-items:center;
+flex-direction:column;
+gap:10px;
+padding:18px;
+margin-bottom:14px;
+border-radius:16px;
+background:rgba(255,255,255,0.06);
 }
 
-.buy{
-background:#fff;
-color:#000;
-border:none;
-padding:6px 14px;
-border-radius:999px;
-cursor:pointer;
+.beat-title{
+font-size:18px;
 font-weight:600;
 }
 
-.footer{
-text-align:center;
-opacity:.5;
-font-size:12px;
-padding:14px;
+.type{
+opacity:.6;
+font-size:14px;
 }
+
+audio{
+width:100%;
+}
+
+.prices{
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.price-list span{
+margin-right:15px;
+opacity:.9;
+}
+
+.buy{
+text-decoration:none;
+padding:10px 18px;
+border-radius:10px;
+background:white;
+color:black;
+font-weight:600;
+transition:.2s;
+}
+
+.buy:hover{
+transform:scale(1.05);
+}
+
+@media(max-width:700px){
+.container{
+margin:10px;
+}
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="bg" class="bg"></div>
+<div class="bg" id="bg"></div>
 
-<div class="app">
+<div class="container">
 
-<div id="hero" class="hero">
-<h1 id="name">Loading...</h1>
-<div id="desc" class="desc"></div>
+<div class="hero">
+<img id="profilePhoto">
+<div class="nickname" id="nickname"></div>
+<div class="description" id="description"></div>
+
+<div class="socials" id="socials"></div>
 </div>
 
-<div id="social" class="social"></div>
-<div id="beats" class="beats"></div>
-
-<div class="footer">Made by BULAVIN</div>
+<div id="beats"></div>
 
 </div>
 
 <script>
 
-const CSV =
+/* ======== ТВОЯ GOOGLE SHEETS ======== */
+const CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
 
-/* ===== LOAD CSV SAFE ===== */
+/* ===== CSV PARSER ===== */
+function parseCSV(text){
+const rows = text.split("\n").map(r=>r.split(","));
+return rows;
+}
 
-Papa.parse(CSV,{
-download:true,
-complete:(res)=>{
+let currentAudio=null;
 
-const rows=res.data;
+fetch(CSV_URL)
+.then(r=>r.text())
+.then(csv=>{
+
+const data=parseCSV(csv);
 
 /* PROFILE */
-const p=rows[1];
+const profile=data[1];
 
-const name=p[0];
-const desc=p[1];
-const photo=p[2];
-const tg=p[3];
-const ig=p[4];
-const yt=p[5];
-const vk=p[6];
-const buy=p[7];
+const nickname=profile[0];
+const description=profile[1];
+const photo=profile[2];
+const telegram=profile[3];
+const instagram=profile[4];
+const youtube=profile[5];
+const vk=profile[6];
+const buyLink=profile[7];
 
-document.getElementById("name").textContent=name;
-document.getElementById("desc").textContent=desc;
-
-document.getElementById("hero").style.backgroundImage=`url(${photo})`;
+document.getElementById("nickname").textContent=nickname;
+document.getElementById("description").textContent=description;
+document.getElementById("profilePhoto").src=photo;
 document.getElementById("bg").style.backgroundImage=`url(${photo})`;
 
-/* SOCIAL */
-
-const social=document.getElementById("social");
+/* SOCIAL LINKS */
+const socials=document.getElementById("socials");
 
 [
-["Telegram",tg],
-["Instagram",ig],
-["YouTube",yt],
+["Telegram",telegram],
+["Instagram",instagram],
+["YouTube",youtube],
 ["VK",vk]
-].forEach(([t,l])=>{
-if(!l) return;
+].forEach(([name,link])=>{
+if(!link) return;
 const a=document.createElement("a");
-a.href=l;
+a.href=link;
 a.target="_blank";
-a.textContent=t;
-social.appendChild(a);
+a.textContent=name;
+socials.appendChild(a);
 });
 
 /* BEATS */
+const beatsContainer=document.getElementById("beats");
 
-const beats=document.getElementById("beats");
+for(let i=4;i<data.length;i++){
 
-rows.slice(4).forEach(r=>{
+const row=data[i];
+if(!row[0]) continue;
 
-if(!r[0]) return;
+const [title,type,mp3,wav,excl,preview]=row;
 
-const div=document.createElement("div");
-div.className="beat";
+const card=document.createElement("div");
+card.className="beat-card";
 
-div.innerHTML=`
-<b>${r[0]}</b><br>
-<small>${r[1]}</small>
+card.innerHTML=`
+<div class="beat-title">${title}</div>
+<div class="type">${type}</div>
 
-<audio controls src="${r[5]}"></audio>
+<audio controls preload="none" src="${preview}"></audio>
 
-<div class="row">
-<div>MP3 ${r[2]} | WAV ${r[3]} | EXCL ${r[4]}</div>
-<button class="buy">Купить</button>
+<div class="prices">
+<div class="price-list">
+<span>MP3: $${mp3}</span>
+<span>WAV: $${wav}</span>
+<span>EXCL: $${excl}</span>
+</div>
+
+<a class="buy" href="${buyLink}" target="_blank">Купить</a>
 </div>
 `;
 
-div.querySelector(".buy").onclick=()=>window.open(buy,"_blank");
+const audio=card.querySelector("audio");
 
-beats.appendChild(div);
-
+audio.addEventListener("play",()=>{
+if(currentAudio && currentAudio!==audio){
+currentAudio.pause();
+}
+currentAudio=audio;
 });
 
+beatsContainer.appendChild(card);
 }
+
 });
 
 </script>
+
 </body>
 </html>
