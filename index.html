@@ -26,7 +26,13 @@ background-size:cover;
 background-position:center;
 filter:blur(60px) brightness(.55);
 transform:scale(1.2);
+transition:transform 1.2s ease, filter .8s ease;
 z-index:-1;
+}
+
+.bg.playing{
+transform:scale(1.28);
+filter:blur(70px) brightness(.6);
 }
 
 /* APP */
@@ -61,13 +67,10 @@ background:linear-gradient(to top,rgba(0,0,0,.85),transparent);
 pointer-events:none;
 }
 
-.hero-text{
-position:relative;
-z-index:2;
-}
+.hero-text{position:relative;z-index:2;}
 
 .hero h1{font-size:26px}
-.hero p{opacity:.8;margin-top:6px}
+.hero p{opacity:.85;margin-top:6px}
 
 /* SOCIAL */
 
@@ -107,41 +110,51 @@ background:rgba(255,255,255,.06);
 backdrop-filter:blur(25px);
 transition:.35s;
 position:relative;
+overflow:hidden;
 }
 
-/* ✨ glass shine FIXED */
+/* LIQUID GLASS SHINE */
+
 .beat:before{
 content:"";
 position:absolute;
 inset:0;
-background:linear-gradient(120deg,transparent,rgba(255,255,255,.2),transparent);
+border-radius:inherit;
+background:linear-gradient(
+120deg,
+transparent 20%,
+rgba(255,255,255,.18),
+transparent 80%
+);
 opacity:0;
-transition:.4s;
-pointer-events:none; /* ← ГЛАВНЫЙ ФИКС */
+transition:.45s;
+pointer-events:none;
 }
 
 .beat:hover:before{opacity:1}
 
 .beats:hover .beat:not(:hover){
-opacity:.4;
+opacity:.45;
 filter:blur(2px);
 }
 
 .beat:hover{
-transform:scale(1.02);
+transform:translateY(-3px) scale(1.02);
 }
 
 /* TITLE */
 
 .title{
 font-weight:600;
+display:flex;
+flex-wrap:wrap;
+gap:6px;
 }
 
 .meta{
 font-size:13px;
-opacity:.7;
+opacity:.75;
 color:#ff8c8c;
-margin-left:6px;
 }
 
 /* PLAYER */
@@ -268,12 +281,15 @@ fetch(CSV_URL)
 .then(r=>r.text())
 .then(text=>{
 
+/* 🔥 BOM FIX */
+text=text.replace(/^\uFEFF/,'');
+
 const rows=text.trim().split("\n").map(r=>r.split(","));
 
 const p=rows[1];
 
-name.textContent=p[0];
-desc.textContent=p[1];
+name.textContent=p[0] || "YourName";
+desc.textContent=p[1] || "";
 
 hero.style.backgroundImage=`url(${p[2]})`;
 bg.style.backgroundImage=`url(${p[2]})`;
@@ -342,11 +358,15 @@ audio.play();
 playBtn.textContent="❚❚";
 currentAudio=audio;
 audio.btn=playBtn;
+bg.classList.add("playing");
 }else{
 audio.pause();
 playBtn.textContent="▶";
+bg.classList.remove("playing");
 }
 };
+
+audio.onended=()=>bg.classList.remove("playing");
 
 audio.ontimeupdate=()=>{
 bar.style.width=(audio.currentTime/audio.duration*100)+"%";
