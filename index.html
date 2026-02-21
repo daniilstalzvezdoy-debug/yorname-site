@@ -1,106 +1,227 @@
-<script>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beat Page</title>
 
-const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
+<style>
 
-const nameEl = document.getElementById("name");
-const descEl = document.getElementById("desc");
-const hero = document.getElementById("hero");
-const bg = document.getElementById("bg");
-const socials = document.getElementById("socials");
-const beats = document.getElementById("beats");
-
-fetch(CSV_URL)
-.then(r => r.text())
-.then(text => {
-
-console.log("CSV loaded");
-
-/* AUTO DELIMITER DETECT */
-const delimiter = text.includes(";") ? ";" : ",";
-
-const rows = text
-.trim()
-.split("\n")
-.map(r => r.split(delimiter));
-
-console.log(rows);
-
-/* PROFILE ROW */
-const p = rows[1];
-
-if(!p){
-nameEl.textContent="Ошибка чтения таблицы";
-return;
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+background:#000;
+display:flex;
+justify-content:center;
+padding:40px;
+color:white;
+overflow-x:hidden;
 }
 
-const name = p[0] || "";
-const desc = p[1] || "";
-const photo = p[2] || "";
-const tg = p[3] || "";
-const ig = p[4] || "";
-const yt = p[5] || "";
-const vk = p[6] || "";
-const buy = p[7] || "#";
+/* BLUR BACKGROUND */
 
-nameEl.textContent = name;
-descEl.textContent = desc;
-
-if(photo){
-hero.style.backgroundImage=`url(${photo})`;
-bg.style.backgroundImage=`url(${photo})`;
+.bg{
+position:fixed;
+inset:0;
+background-size:cover;
+background-position:center;
+filter:blur(80px) brightness(.4);
+z-index:-1;
 }
+
+/* GLASS CARD */
+
+.app{
+width:420px;
+border-radius:28px;
+overflow:hidden;
+background:rgba(20,20,20,.7);
+backdrop-filter:blur(30px);
+box-shadow:0 20px 80px rgba(0,0,0,.6);
+}
+
+/* HERO */
+
+.hero{
+height:260px;
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:flex-end;
+padding:20px;
+position:relative;
+}
+
+.hero::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(to top,#000,transparent);
+}
+
+.hero-content{
+position:relative;
+z-index:2;
+}
+
+h1{margin:0;font-size:22px}
+.desc{opacity:.8;font-size:14px}
 
 /* SOCIALS */
 
+.socials{
+display:flex;
+gap:10px;
+padding:15px;
+flex-wrap:wrap;
+}
+
+.social{
+padding:8px 14px;
+border-radius:12px;
+background:rgba(255,255,255,.08);
+text-decoration:none;
+color:white;
+font-size:13px;
+}
+
+/* BEATS */
+
+.beats{padding:15px}
+
+.beat{
+background:rgba(255,255,255,.05);
+padding:14px;
+border-radius:16px;
+margin-bottom:12px;
+}
+
+.title{font-weight:600}
+.type{opacity:.6;font-size:13px;margin-bottom:8px}
+
+audio{
+width:100%;
+margin:8px 0;
+}
+
+.bottom{
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:13px;
+}
+
+.buy{
+padding:6px 14px;
+border-radius:999px;
+background:white;
+color:black;
+text-decoration:none;
+font-weight:600;
+}
+
+.footer{
+text-align:center;
+opacity:.5;
+padding:12px;
+font-size:12px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="bg"></div>
+
+<div class="app">
+
+<div class="hero" id="hero">
+<div class="hero-content">
+<h1 id="name">Loading...</h1>
+<div class="desc" id="desc"></div>
+</div>
+</div>
+
+<div class="socials" id="socials"></div>
+
+<div class="beats" id="beats"></div>
+
+<div class="footer">Made by BULAVIN</div>
+
+</div>
+
+<script>
+
+const CSV =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmxlUTk7TAq2akhZW8eY7OxYkgbNcDFyfcOqfyq17_L4w3xRW8cz14JWME0_Fk29hWs/pub?output=csv";
+
+fetch(CSV)
+.then(r=>r.text())
+.then(text=>{
+
+const rows=text.trim().split("\n").map(r=>r.split(","));
+
+/* PROFILE */
+
+const p=rows[1];
+
+document.getElementById("name").textContent=p[0];
+document.getElementById("desc").textContent=p[1];
+
+const photo=p[2];
+
+document.getElementById("hero").style.backgroundImage=`url(${photo})`;
+document.getElementById("bg").style.backgroundImage=`url(${photo})`;
+
+/* SOCIALS */
+
+const socials=document.getElementById("socials");
+
 [
-["Telegram", tg],
-["Instagram", ig],
-["YouTube", yt],
-["VK", vk]
-].forEach(([label, link])=>{
+["Telegram",p[3]],
+["Instagram",p[4]],
+["YouTube",p[5]],
+["VK",p[6]]
+].forEach(([name,link])=>{
 if(link){
 const a=document.createElement("a");
 a.className="social";
 a.href=link;
 a.target="_blank";
-a.textContent=label;
+a.textContent=name;
 socials.appendChild(a);
 }
 });
 
 /* BEATS */
 
+const beats=document.getElementById("beats");
+
 rows.slice(5).forEach(r=>{
+if(!r[0])return;
 
-if(!r[0]) return;
+const el=document.createElement("div");
+el.className="beat";
 
-const div=document.createElement("div");
-div.className="beat";
-
-div.innerHTML=`
+el.innerHTML=`
 <div class="title">${r[0]}</div>
-<div class="type">${r[1] || ""}</div>
+<div class="type">${r[1]}</div>
 
 <audio controls src="${r[5]}"></audio>
 
 <div class="bottom">
 <div>MP3 ${r[2]} | WAV ${r[3]} | EXCL ${r[4]}</div>
-<a class="buy" href="${buy}" target="_blank">Купить</a>
+<a class="buy" href="${p[7]}" target="_blank">Купить</a>
 </div>
 `;
 
-beats.appendChild(div);
+beats.appendChild(el);
+});
 
 });
 
-})
-.catch(err=>{
-console.error(err);
-nameEl.textContent="Ошибка загрузки CSV";
-});
-
-/* ONE PLAYER ONLY */
+/* ONLY ONE AUDIO */
 
 document.addEventListener("play",e=>{
 document.querySelectorAll("audio").forEach(a=>{
@@ -109,3 +230,6 @@ if(a!==e.target)a.pause();
 },true);
 
 </script>
+
+</body>
+</html>
