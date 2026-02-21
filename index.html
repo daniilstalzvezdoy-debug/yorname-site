@@ -3,47 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Beat Store | Витрина</title>
+<title>Beat Store | Premium</title>
 
 <style>
 /* ОСНОВНЫЕ СТИЛИ */
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:#0b0b0b;color:#fff;display:flex;justify-content:center;padding:20px 12px;min-height:100vh}
+
+/* ЭФФЕКТ ШУМА (NOISE) */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('https://grainy-gradients.vercel.app/noise.svg');
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 10;
+}
+
+body{background:#080808;color:#fff;display:flex;justify-content:center;padding:20px 12px;min-height:100vh}
 
 .bg{
 position:fixed;inset:0;
 background-size:cover;
 background-position:center;
-filter:blur(60px) brightness(.4);
+filter:blur(60px) brightness(.35);
 transform:scale(1.2);
-transition:all 1.2s ease;
+transition:all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 z-index:-1;
 }
 
 .bg.playing{
-transform:scale(1.35);
-filter:blur(50px) brightness(.6);
+transform:scale(1.3);
+filter:blur(50px) brightness(.5);
 }
 
 .app{
 width:520px;max-width:100%;
-border-radius:28px;
+border-radius:32px;
 overflow:hidden;
-background:rgba(255,255,255,.03);
-backdrop-filter:blur(30px);
-border:1px solid rgba(255,255,255,.1);
-box-shadow:0 25px 90px rgba(0,0,0,.8);
+background:rgba(15,15,15,.4);
+backdrop-filter:blur(40px);
+border:1px solid rgba(255,255,255,.08);
+box-shadow:0 30px 100px rgba(0,0,0,.9);
 display:flex;flex-direction:column;
+z-index:1;
 }
 
 /* ШАПКА */
 .hero{
-height:280px;
+height:300px;
 background-size:cover;
 background-position:center;
 display:flex;
 align-items:flex-end;
-padding:24px;
+padding:28px;
 position:relative;
 }
 
@@ -51,12 +64,12 @@ position:relative;
 content:"";
 position:absolute;
 inset:0;
-background:linear-gradient(to top, rgba(11,11,11,1) 0%, rgba(11,11,11,0.5) 50%, transparent 100%);
+background:linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.4) 60%, transparent 100%);
 }
 
 .hero-text{position:relative;z-index:2;width:100%}
-.hero h1{font-size:32px;letter-spacing:-0.5px}
-.hero p{opacity:0.7;margin-top:4px;font-size:15px;line-height:1.4}
+.hero h1{font-size:34px;letter-spacing:-1px;font-weight:800}
+.hero p{opacity:0.6;margin-top:4px;font-size:14px;line-height:1.4;max-width:90%}
 
 /* СОЦСЕТИ */
 .social{
@@ -68,62 +81,85 @@ scrollbar-width:none;
 .social::-webkit-scrollbar{display:none}
 
 .social a{
-padding:8px 18px;
-border-radius:12px;
-background:rgba(255,255,255,.07);
+padding:10px 20px;
+border-radius:14px;
+background:rgba(255,255,255,.05);
 text-decoration:none;
 color:#fff;
 font-size:13px;
-font-weight:500;
-transition:0.2s;
-border:1px solid rgba(255,255,255,.05);
+font-weight:600;
+transition:0.3s;
+border:1px solid rgba(255,255,255,.03);
 white-space:nowrap;
 }
+.social a:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2)}
 
 /* СПИСОК БИТОВ */
-.beats{padding:8px 16px 30px;display:flex;flex-direction:column;gap:12px}
-
-.beat{
-padding:18px;
-border-radius:20px;
-background:rgba(255,255,255,.04);
-border:1px solid rgba(255,255,255,.05);
-transition:0.3s cubic-bezier(0.4,0,0.2,1);
-position:relative;
+.beats{
+    padding:8px 16px 30px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
 }
 
-.title{font-weight:700;font-size:17px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:2px}
-.meta{font-size:12px;color:#ff5050;font-weight:400;opacity:0.9}
-.artist{font-size:14px;opacity:0.5;margin-bottom:12px}
+/* ЭФФЕКТ РАЗМЫТИЯ ПРИ НАВЕДЕНИИ (BLUR OTHERS) */
+.beats:hover .beat:not(:hover) {
+    filter: blur(4px) grayscale(0.5);
+    opacity: 0.4;
+    transform: scale(0.98);
+}
+
+.beat{
+padding:20px;
+border-radius:24px;
+background:rgba(255,255,255,.03);
+border:1px solid rgba(255,255,255,.05);
+transition:all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+position:relative;
+cursor: pointer;
+}
+
+.beat:hover{
+background:rgba(255,255,255,.08);
+border-color:rgba(255,255,255,.15);
+transform: scale(1.02);
+box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.title{font-weight:700;font-size:18px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:4px}
+.meta{font-size:11px;color:#ff4d4d;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.artist{font-size:14px;opacity:0.4;margin-bottom:16px}
 
 /* ПЛЕЕР */
-.player{display:flex;align-items:center;gap:12px}
+.player{display:flex;align-items:center;gap:15px}
 .play{
-width:40px;height:40px;border-radius:50%;
+width:44px;height:44px;border-radius:50%;
 border:none;background:#fff;
 color:#000;cursor:pointer;
 display:flex;align-items:center;justify-content:center;
-font-size:14px;transition:0.2s;flex-shrink:0;
+font-size:16px;transition:0.2s;flex-shrink:0;
+box-shadow: 0 4px 15px rgba(255,255,255,0.2);
 }
+.play:hover{transform:scale(1.1)}
 
-.progress{flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:10px;cursor:pointer;position:relative}
-.bar{height:100%;width:0%;background:#fff;border-radius:10px}
+.progress{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:10px;cursor:pointer;position:relative}
+.bar{height:100%;width:0%;background:#fff;border-radius:10px;box-shadow: 0 0 10px #fff}
 
-/* КНОПКИ И ЦЕНЫ (ФИКС ВЫЛЕТАНИЯ) */
+/* КНОПКИ И ЦЕНЫ */
 .bottom {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 16px;
+    margin-top: 20px;
     gap: 12px;
-    flex-wrap: wrap; /* Позволяет переносить кнопки вниз */
+    flex-wrap: wrap;
 }
 
 .price {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.5px;
-    opacity: 0.8;
+    opacity: 0.7;
     flex: 1 1 auto;
 }
 
@@ -135,26 +171,28 @@ font-size:14px;transition:0.2s;flex-shrink:0;
 
 .download, .buy {
     border: none;
-    padding: 8px 16px;
-    border-radius: 10px;
+    padding: 10px 18px;
+    border-radius: 12px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: 0.2s;
     white-space: nowrap;
 }
-.download { background: rgba(255,255,255,.1); color: #fff; }
-.buy { background: #ff5050; color: #fff; }
+.download { background: rgba(255,255,255,.07); color: #fff; border: 1px solid rgba(255,255,255,.1); }
+.buy { background: #ff3b3b; color: #fff; box-shadow: 0 4px 15px rgba(255,59,59,0.3); }
+.buy:hover { background: #ff5252; transform: translateY(-1px); }
 
-/* Адаптация для совсем узких экранов */
-@media (max-width: 400px) {
-    .bottom { flex-direction: column; align-items: flex-start; }
+/* Адаптация для мобилок */
+@media (max-width: 420px) {
+    .bottom { flex-direction: column; align-items: flex-start; gap: 15px; }
     .actions { width: 100%; }
     .download, .buy { flex: 1; text-align: center; }
+    .hero h1 { font-size: 28px; }
 }
 
-.footer{text-align:center;padding:24px;font-size:12px;opacity:0.4}
-.footer a{color:#fff;text-decoration:none}
+.footer{text-align:center;padding:30px;font-size:11px;opacity:0.3;letter-spacing:1px}
+.footer a{color:#fff;text-decoration:none;font-weight:bold}
 </style>
 </head>
 
@@ -165,7 +203,7 @@ font-size:14px;transition:0.2s;flex-shrink:0;
 <div class="app">
     <div class="hero" id="hero">
         <div class="hero-text">
-            <h1 id="name">Загрузка...</h1>
+            <h1 id="name">...</h1>
             <p id="desc"></p>
         </div>
     </div>
@@ -186,7 +224,6 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaW-Jeexk1nvmx
 let currentAudio = null;
 let currentBtn = null;
 
-// ✅ КОРРЕКТНЫЙ ПАРСЕР CSV
 function parseCSV(text) {
     const result = [];
     let row = [];
@@ -260,7 +297,8 @@ fetch(CSV_URL)
             const bar = card.querySelector(".bar");
             const progress = card.querySelector(".progress");
 
-            playBtn.onclick = () => {
+            playBtn.onclick = (e) => {
+                e.stopPropagation();
                 if (currentAudio && currentAudio !== audio) {
                     currentAudio.pause();
                     currentBtn.textContent = "▶";
@@ -285,15 +323,17 @@ fetch(CSV_URL)
             audio.onended = () => {
                 playBtn.textContent = "▶";
                 document.getElementById('bg').classList.remove("playing");
+                bar.style.width = "0%";
             };
 
             progress.onclick = (e) => {
+                e.stopPropagation();
                 const rect = progress.getBoundingClientRect();
                 audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
             };
 
-            card.querySelector(".buy").onclick = () => window.open(buyLink, "_blank");
-            card.querySelector(".download").onclick = () => window.open(r[7], "_blank");
+            card.querySelector(".buy").onclick = (e) => { e.stopPropagation(); window.open(buyLink, "_blank"); };
+            card.querySelector(".download").onclick = (e) => { e.stopPropagation(); window.open(r[7], "_blank"); };
 
             beatsContainer.appendChild(card);
         });
